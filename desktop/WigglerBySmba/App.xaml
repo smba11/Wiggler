@@ -1,0 +1,20 @@
+<Application x:Class="WigglerBySmba.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF4F1EA" />
+        <SolidColorBrush x:Key="PanelBrush" Color="#FFF9F6EF" />
+        <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
+        <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#FFE8F3F1" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#FF0F766E" />
+        <SolidColorBrush x:Key="AccentMutedBrush" Color="#1A0F766E" />
+        <SolidColorBrush x:Key="TextBrush" Color="#FF1F2937" />
+        <SolidColorBrush x:Key="SubtleTextBrush" Color="#FF6B7280" />
+        <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="#FFF7F4EE" />
+        <SolidColorBrush x:Key="SettingsPanelBrush" Color="#FFFCFAF5" />
+        <SolidColorBrush x:Key="ThemeChipBrush" Color="#FFE5F3F0" />
+        <SolidColorBrush x:Key="ThemeChipBorderBrush" Color="#FFB9DDD7" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </Application.Resources>
+</Application>

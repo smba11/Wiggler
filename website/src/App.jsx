@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
-const settingsIconUrl = `${import.meta.env.BASE_URL}assets/settings-icon.png`
-
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
 
 const patternConfig = {
@@ -1403,28 +1401,34 @@ function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIs
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
-        <img src={settingsIconUrl} alt="" />
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19.14 12.94c.04-.31.06-.62.06-.94s-.02-.63-.06-.94l2.03-1.58a.65.65 0 0 0 .16-.82l-1.92-3.32a.66.66 0 0 0-.78-.29l-2.39.96a7.2 7.2 0 0 0-1.62-.94l-.36-2.54A.66.66 0 0 0 13.6 1h-3.2a.66.66 0 0 0-.65.56l-.36 2.54c-.58.22-1.12.54-1.62.94l-2.39-.96a.66.66 0 0 0-.78.29L2.68 7.69a.65.65 0 0 0 .16.82l2.03 1.58c-.04.31-.07.62-.07.94s.03.63.07.94l-2.03 1.58a.65.65 0 0 0-.16.82l1.92 3.32c.16.28.49.4.78.29l2.39-.96c.5.4 1.04.72 1.62.94l.36 2.54c.05.32.32.56.65.56h3.2c.33 0 .6-.24.65-.56l.36-2.54c.58-.22 1.12-.54 1.62-.94l2.39.96c.29.11.62-.01.78-.29l1.92-3.32a.65.65 0 0 0-.16-.82l-2.03-1.58ZM12 15.4A3.4 3.4 0 1 1 12 8.6a3.4 3.4 0 0 1 0 6.8Z" />
+        </svg>
       </button>
 
       {isOpen && (
         <div className="settings-popover">
           <div className="setting-group compact">
             <label htmlFor="theme-select">{text.theme}</label>
-            <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
-              <option value="light">{text.light}</option>
-              <option value="dark">{text.dark}</option>
-            </select>
+            <div className="select-shell">
+              <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
+                <option value="light">{text.light}</option>
+                <option value="dark">{text.dark}</option>
+              </select>
+            </div>
           </div>
 
           <div className="setting-group compact">
             <label htmlFor="language-select">{text.language}</label>
-            <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
-              {Object.entries(text.languageOptions).map(([code, label]) => (
-                <option key={code} value={code}>
-                  {label}
-                </option>
-              ))}
-            </select>
+            <div className="select-shell">
+              <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
+                {Object.entries(text.languageOptions).map(([code, label]) => (
+                  <option key={code} value={code}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       )}

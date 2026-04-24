@@ -16,7 +16,7 @@ public sealed class MouseMovementService : IDisposable
     private MovementPattern _pattern;
     private double _speed;
     private double _size;
-    private double _phase;
+    private double _cycleProgress;
     private Vector _centerVelocity;
     private Point _roamingCenter;
     private Point _randomTarget;
@@ -38,10 +38,11 @@ public sealed class MouseMovementService : IDisposable
         _pattern = pattern;
         _speed = speed;
         _size = size;
-        _phase = 0;
+        _cycleProgress = 0;
 
         NativeMethods.GetCursorPos(out var cursor);
-        _roamingCenter = new Point(cursor.X, cursor.Y);
+        var startPoint = new Point(cursor.X, cursor.Y);
+        _roamingCenter = DeriveCenterFromCursor(pattern, startPoint);
         _centerVelocity = CreateVelocity();
         _randomTarget = CreateRandomTarget();
         _isRunning = true;
@@ -66,17 +67,23 @@ public sealed class MouseMovementService : IDisposable
         var dt = Math.Clamp(_stopwatch.Elapsed.TotalSeconds, 0.01, 0.08);
         _stopwatch.Restart();
 
-        UpdateRoamingCenter(dt);
-        _phase += dt * Math.Max(0.9, _speed * 1.8);
+        if (_pattern == MovementPattern.Random)
+        {
+            MoveTowardTarget(NextRandomPoint(), dt);
+            return;
+        }
 
-        var target = _pattern == MovementPattern.Random
-            ? NextRandomPoint()
-            : PointAlongPattern(_pattern, _phase);
+        _cycleProgress += dt * GetLoopsPerSecond(_pattern);
+        while (_cycleProgress >= 1)
+        {
+            _cycleProgress -= 1;
+            AdvanceRoamingCenter();
+        }
 
-        MoveTowardTarget(target, dt);
+        MoveCursor(PointAlongPattern(_pattern, _cycleProgress));
     }
 
-    private void UpdateRoamingCenter(double dt)
+    private void AdvanceRoamingCenter()
     {
         var bounds = GetVirtualBounds();
         var margin = _size + 80;
@@ -84,10 +91,11 @@ public sealed class MouseMovementService : IDisposable
         var top = bounds.Top + margin;
         var right = bounds.Right - margin;
         var bottom = bounds.Bottom - margin;
+        var travel = 14 + (_speed * 8);
 
         _roamingCenter = new Point(
-            _roamingCenter.X + (_centerVelocity.X * dt),
-            _roamingCenter.Y + (_centerVelocity.Y * dt));
+            _roamingCenter.X + (_centerVelocity.X * travel),
+            _roamingCenter.Y + (_centerVelocity.Y * travel));
 
         if (_roamingCenter.X < left || _roamingCenter.X > right)
         {
@@ -102,31 +110,31 @@ public sealed class MouseMovementService : IDisposable
         }
     }
 
-    private Point PointAlongPattern(MovementPattern pattern, double phase)
+    private Point PointAlongPattern(MovementPattern pattern, double progress)
     {
         var amplitude = _size;
         return pattern switch
         {
             MovementPattern.Circle => ClampToScreen(new Point(
-                _roamingCenter.X + (Math.Cos(phase) * amplitude),
-                _roamingCenter.Y + (Math.Sin(phase) * amplitude))),
-            MovementPattern.Square => ClampToScreen(TracePolygon(phase * 0.38, new[]
+                _roamingCenter.X + (Math.Cos(progress * Math.PI * 2) * amplitude),
+                _roamingCenter.Y + (Math.Sin(progress * Math.PI * 2) * amplitude))),
+            MovementPattern.Square => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(-amplitude, -amplitude),
                 new Point(amplitude, -amplitude),
                 new Point(amplitude, amplitude),
                 new Point(-amplitude, amplitude)
             })),
-            MovementPattern.Triangle => ClampToScreen(TracePolygon(phase * 0.44, new[]
+            MovementPattern.Triangle => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(0, -amplitude),
                 new Point(amplitude, amplitude * 0.76),
                 new Point(-amplitude, amplitude * 0.76)
             })),
             MovementPattern.Figure8 => ClampToScreen(new Point(
-                _roamingCenter.X + (Math.Sin(phase) * amplitude),
-                _roamingCenter.Y + (Math.Sin(phase * 2) * amplitude * 0.58))),
-            MovementPattern.Parallelogram => ClampToScreen(TracePolygon(phase * 0.36, new[]
+                _roamingCenter.X + (Math.Sin(progress * Math.PI * 2) * amplitude),
+                _roamingCenter.Y + (Math.Sin(progress * Math.PI * 4) * amplitude * 0.58))),
+            MovementPattern.Parallelogram => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(-amplitude * 0.72, -amplitude),
                 new Point(amplitude * 0.92, -amplitude),
@@ -140,7 +148,7 @@ public sealed class MouseMovementService : IDisposable
     private Point TracePolygon(double progress, Point[] points)
     {
         var loops = points.Length;
-        var normalized = ((progress % loops) + loops) % loops;
+        var normalized = (((progress % 1) + 1) % 1) * loops;
         var index = (int)Math.Floor(normalized);
         var nextIndex = (index + 1) % loops;
         var edgeProgress = normalized - index;
@@ -220,8 +228,46 @@ public sealed class MouseMovementService : IDisposable
     private Vector CreateVelocity()
     {
         var angle = _random.NextDouble() * Math.PI * 2;
-        var magnitude = 34 + (_speed * 22);
-        return new Vector(Math.Cos(angle) * magnitude, Math.Sin(angle) * magnitude);
+        return new Vector(Math.Cos(angle), Math.Sin(angle));
+    }
+
+    private Point DeriveCenterFromCursor(MovementPattern pattern, Point cursor)
+    {
+        var offset = pattern switch
+        {
+            MovementPattern.Circle => new Vector(_size, 0),
+            MovementPattern.Square => new Vector(-_size, -_size),
+            MovementPattern.Triangle => new Vector(0, -_size),
+            MovementPattern.Figure8 => new Vector(0, 0),
+            MovementPattern.Parallelogram => new Vector(-_size * 0.72, -_size),
+            _ => new Vector(0, 0)
+        };
+
+        return ClampCenter(cursor - offset);
+    }
+
+    private double GetLoopsPerSecond(MovementPattern pattern)
+    {
+        var baseLoops = pattern switch
+        {
+            MovementPattern.Circle => 0.18,
+            MovementPattern.Square => 0.16,
+            MovementPattern.Triangle => 0.17,
+            MovementPattern.Figure8 => 0.14,
+            MovementPattern.Parallelogram => 0.15,
+            _ => 0.16
+        };
+
+        return baseLoops * Math.Max(0.75, _speed * 0.95);
+    }
+
+    private Point ClampCenter(Point point)
+    {
+        var bounds = GetVirtualBounds();
+        var margin = _size + 80;
+        return new Point(
+            Math.Clamp(point.X, bounds.Left + margin, bounds.Right - margin),
+            Math.Clamp(point.Y, bounds.Top + margin, bounds.Bottom - margin));
     }
 
     private static double Lerp(double start, double end, double progress) =>

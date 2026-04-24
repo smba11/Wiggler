@@ -59,11 +59,6 @@ public partial class MainWindow : Window
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _viewModel.Initialize();
-
-        if (_viewModel.ShouldLaunchInTray)
-        {
-            HideToTray();
-        }
     }
 
     private void OnStateChanged(object? sender, EventArgs e)

@@ -12,6 +12,9 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}">
     <Window.Resources>
+        <ImageBrush x:Key="SettingsIconBrush"
+                    ImageSource="pack://application:,,,/Assets/settings-icon.png"
+                    Stretch="Uniform" />
         <Style TargetType="Button" x:Key="SecondaryButtonStyle">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
@@ -35,11 +38,89 @@
             </Setter>
         </Style>
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="40" />
+            <Setter Property="Height" Value="48" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
-            <Setter Property="Padding" Value="6,4" />
+            <Setter Property="Padding" Value="18,6" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="ComboBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="20">
+                                <Grid>
+                                    <ContentPresenter Margin="18,0,46,0"
+                                                      VerticalAlignment="Center"
+                                                      Content="{TemplateBinding SelectionBoxItem}" />
+                                    <Path Width="10"
+                                          Height="6"
+                                          Margin="0,0,18,0"
+                                          HorizontalAlignment="Right"
+                                          VerticalAlignment="Center"
+                                          Stroke="{DynamicResource SubtleTextBrush}"
+                                          StrokeThickness="2"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          Data="M 0 0 L 5 5 L 10 0" />
+                                </Grid>
+                            </Border>
+                            <Popup x:Name="PART_Popup"
+                                   AllowsTransparency="True"
+                                   Placement="Bottom"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   PopupAnimation="Fade">
+                                <Border Margin="0,8,0,0"
+                                        MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
+                                        Background="{DynamicResource SurfaceBrush}"
+                                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="22">
+                                    <ScrollViewer Margin="6"
+                                                  CanContentScroll="True"
+                                                  VerticalScrollBarVisibility="Auto">
+                                        <ItemsPresenter />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Padding" Value="12,10" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder"
+                                Margin="4"
+                                Background="Transparent"
+                                CornerRadius="14">
+                            <ContentPresenter Margin="10,0" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsHighlighted" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource ThemeChipBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="{DynamicResource AccentMutedBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style TargetType="Slider">
             <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
@@ -61,12 +142,12 @@
             <StackPanel>
                 <TextBlock FontSize="14"
                            Foreground="{DynamicResource SubtleTextBrush}"
-                           Text="WIGGLER" />
+                           Text="{Binding BrandTitle}" />
                 <TextBlock Margin="0,6,0,0"
                            FontSize="16"
                            FontWeight="SemiBold"
                            Foreground="{DynamicResource TextBrush}"
-                           Text="by SMBA" />
+                           Text="{Binding BrandSubtitle}" />
             </StackPanel>
 
             <Border Grid.Column="1"
@@ -76,10 +157,10 @@
                     BorderThickness="1"
                     CornerRadius="18"
                     VerticalAlignment="Center">
-                <StackPanel Orientation="Horizontal">
+                    <StackPanel Orientation="Horizontal">
                     <TextBlock FontSize="12"
                                Foreground="{DynamicResource SubtleTextBrush}"
-                               Text="Status" />
+                               Text="{Binding StatusTitle}" />
                     <TextBlock Margin="8,0,0,0"
                                FontSize="12"
                                FontWeight="SemiBold"
@@ -124,7 +205,7 @@
                                 <TextBlock FontSize="15"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource AccentBrush}"
-                                           Text="Quiet control for your cursor" />
+                                           Text="{Binding HeroEyebrow}" />
                                 <TextBlock Margin="0,14,0,0"
                                            FontSize="52"
                                            LineHeight="56"
@@ -150,18 +231,18 @@
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock FontSize="13"
                                                Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="Now tuned for" />
+                                               Text="{Binding NowTunedForLabel}" />
                                     <TextBlock Margin="0,8,0,0"
                                                FontSize="28"
                                                FontWeight="SemiBold"
                                                Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding SelectedPattern}" />
+                                               Text="{Binding LocalizedSelectedPattern}" />
                                     <TextBlock Margin="0,10,0,0"
                                                FontSize="14"
                                                LineHeight="22"
                                                TextWrapping="Wrap"
                                                Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="Smooth movement, instant interruption, and tighter tray behavior." />
+                                               Text="{Binding HeroCardDetail}" />
                                 </StackPanel>
                             </Border>
                         </Grid>
@@ -176,7 +257,7 @@
                         <StackPanel>
                             <TextBlock FontSize="14"
                                        Foreground="{DynamicResource SubtleTextBrush}"
-                                       Text="Behavior" />
+                                       Text="{Binding BehaviorTitle}" />
                             <TextBlock Margin="0,8,0,0"
                                        FontSize="28"
                                        FontWeight="SemiBold"
@@ -214,20 +295,20 @@
                     <UniformGrid Grid.Row="2" Margin="0,24,0,0" Columns="3">
                         <Border Margin="0,0,14,0" Padding="18" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="22">
                             <StackPanel>
-                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Idle delay" />
+                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding IdleDelayCardTitle}" />
                                 <TextBlock Margin="0,10,0,0" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding IdleDelayDisplay}" />
                             </StackPanel>
                         </Border>
                         <Border Margin="0,0,14,0" Padding="18" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="22">
                             <StackPanel>
-                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Pattern" />
-                                <TextBlock Margin="0,10,0,0" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding SelectedPattern}" />
+                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding PatternCardTitle}" />
+                                <TextBlock Margin="0,10,0,0" FontSize="30" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding LocalizedSelectedPattern}" />
                             </StackPanel>
                         </Border>
                         <Border Padding="18" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="22">
                             <StackPanel>
-                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Takeover" />
-                                <TextBlock Margin="0,10,0,0" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="Your mouse wins instantly" />
+                                <TextBlock FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding TakeoverTitle}" />
+                                <TextBlock Margin="0,10,0,0" FontSize="20" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding TakeoverValue}" />
                             </StackPanel>
                         </Border>
                     </UniformGrid>
@@ -248,26 +329,33 @@
                                 <TextBlock FontSize="16"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextBrush}"
-                                           Text="How it feels" />
+                                           Text="{Binding HowItFeelsTitle}" />
                                 <TextBlock Margin="0,14,0,0"
                                            FontSize="14"
                                            LineHeight="22"
                                            TextWrapping="Wrap"
                                            Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="WIGGLER arms first, waits for you to go idle, then traces visible shapes across the screen. The moment you touch the mouse, it stops and hands control back." />
+                                           Text="{Binding HowItFeelsBody}" />
                                 <WrapPanel Margin="0,18,0,0">
                                     <Button Width="156"
                                             Height="46"
                                             Margin="0,0,12,12"
                                             Style="{StaticResource SecondaryButtonStyle}"
                                             Command="{Binding ToggleSettingsCommand}"
-                                            Content="{Binding SettingsButtonLabel}" />
+                                            >
+                                        <StackPanel Orientation="Horizontal">
+                                            <Grid Width="16" Height="16" Margin="0,0,8,0">
+                                                <Rectangle Fill="{DynamicResource TextBrush}" OpacityMask="{StaticResource SettingsIconBrush}" />
+                                            </Grid>
+                                            <TextBlock Text="{Binding SettingsButtonLabel}" />
+                                        </StackPanel>
+                                    </Button>
                                     <Button Width="156"
                                             Height="46"
                                             Margin="0,0,12,12"
                                             Style="{StaticResource SecondaryButtonStyle}"
                                             Command="{Binding ReplayTutorialCommand}"
-                                            Content="Replay tutorial" />
+                                            Content="{Binding ReplayTutorialLabel}" />
                                 </WrapPanel>
                             </StackPanel>
                         </Border>
@@ -282,13 +370,13 @@
                                 <TextBlock FontSize="16"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextBrush}"
-                                           Text="Tray-ready" />
+                                           Text="{Binding TrayReadyTitle}" />
                                 <TextBlock Margin="0,14,0,0"
                                            FontSize="14"
                                            LineHeight="22"
                                            TextWrapping="Wrap"
                                            Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="Set launch mode to Tray if you want WIGGLER to stay tucked away. Close behavior can either exit completely or minimize to the tray and keep running." />
+                                           Text="{Binding TrayReadyBody}" />
                             </StackPanel>
                         </Border>
                     </Grid>
@@ -307,38 +395,60 @@
                     </Grid.RowDefinitions>
 
                     <StackPanel>
-                        <TextBlock FontSize="30"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextBrush}"
-                                   Text="Settings" />
+                        <StackPanel Orientation="Horizontal">
+                            <Grid Width="28" Height="28" Margin="0,0,12,0">
+                                <Rectangle Fill="{DynamicResource TextBrush}" OpacityMask="{StaticResource SettingsIconBrush}" />
+                            </Grid>
+                            <TextBlock FontSize="30"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Text="{Binding SettingsHeaderTitle}" />
+                        </StackPanel>
                         <TextBlock Margin="0,8,0,0"
                                    FontSize="14"
                                    LineHeight="22"
                                    TextWrapping="Wrap"
                                    Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="Shape the vibe, tray behavior, and movement feel from one place." />
+                                   Text="{Binding SettingsSubtitle}" />
                     </StackPanel>
 
                     <ScrollViewer Grid.Row="1" Margin="0,18,0,0" VerticalScrollBarVisibility="Auto">
                         <StackPanel Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
                             <Border Padding="20" Background="{DynamicResource SettingsPanelBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="24">
                                 <StackPanel>
-                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="Look" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Mode" />
-                                    <ComboBox ItemsSource="{Binding ThemeModeOptions}" SelectedItem="{Binding SelectedThemeMode}" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Color vibe" />
-                                    <ComboBox ItemsSource="{Binding ThemeVibeOptions}" SelectedItem="{Binding SelectedThemeVibe}" />
+                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding LookSectionTitle}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding ThemeLabel}" />
+                                    <ComboBox ItemsSource="{Binding ThemeModeItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedThemeMode}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding ColorVibeLabel}" />
+                                    <ComboBox ItemsSource="{Binding ThemeVibeItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedThemeVibe}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding LanguageLabel}" />
+                                    <ComboBox ItemsSource="{Binding LanguageItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedLanguageCode}" />
                                 </StackPanel>
                             </Border>
 
                             <Border Margin="0,16,0,0" Padding="20" Background="{DynamicResource SettingsPanelBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="24">
                                 <StackPanel>
-                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="Behavior" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Launch in" />
-                                    <ComboBox ItemsSource="{Binding LaunchModeOptions}" SelectedItem="{Binding SelectedLaunchMode}" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Close behavior" />
-                                    <ComboBox ItemsSource="{Binding CloseBehaviorOptions}" SelectedItem="{Binding SelectedCloseBehavior}" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Idle delay" />
+                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding BehaviorSectionTitle}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding LaunchInLabel}" />
+                                    <ComboBox ItemsSource="{Binding LaunchModeItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedLaunchMode}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding CloseBehaviorLabel}" />
+                                    <ComboBox ItemsSource="{Binding CloseBehaviorItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedCloseBehavior}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding IdleDelayLabel}" />
                                     <Slider Minimum="5" Maximum="60" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding IdleDelaySeconds}" />
                                     <TextBlock Margin="0,6,0,0" FontSize="12" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding IdleDelayDisplay}" />
                                 </StackPanel>
@@ -346,13 +456,16 @@
 
                             <Border Margin="0,16,0,0" Padding="20" Background="{DynamicResource SettingsPanelBrush}" BorderBrush="{DynamicResource HeroOutlineBrush}" BorderThickness="1" CornerRadius="24">
                                 <StackPanel>
-                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="Movement" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Pattern" />
-                                    <ComboBox ItemsSource="{Binding PatternOptions}" SelectedItem="{Binding SelectedPattern}" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Speed" />
+                                    <TextBlock FontSize="17" FontWeight="SemiBold" Foreground="{DynamicResource TextBrush}" Text="{Binding MovementSectionTitle}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding PatternLabel}" />
+                                    <ComboBox ItemsSource="{Binding PatternItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedPattern}" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding SpeedLabel}" />
                                     <Slider Minimum="0.5" Maximum="3" TickFrequency="0.1" IsSnapToTickEnabled="True" Value="{Binding Speed}" />
                                     <TextBlock Margin="0,6,0,0" FontSize="12" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding SpeedDisplay}" />
-                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="Size" />
+                                    <TextBlock Margin="0,16,0,8" FontSize="13" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding SizeLabel}" />
                                     <Slider Minimum="40" Maximum="180" TickFrequency="5" IsSnapToTickEnabled="True" Value="{Binding Size}" />
                                     <TextBlock Margin="0,6,0,0" FontSize="12" Foreground="{DynamicResource SubtleTextBrush}" Text="{Binding SizeDisplay}" />
                                 </StackPanel>
@@ -362,7 +475,7 @@
                                     Height="48"
                                     Style="{StaticResource SecondaryButtonStyle}"
                                     Command="{Binding ReplayTutorialCommand}"
-                                    Content="Replay tutorial" />
+                                    Content="{Binding ReplayTutorialLabel}" />
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>

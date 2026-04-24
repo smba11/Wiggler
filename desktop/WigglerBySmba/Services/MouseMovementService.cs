@@ -20,9 +20,7 @@ public sealed class MouseMovementService : IDisposable
     private double _phase;
     private Vector _centerVelocity;
     private Point _roamingCenter;
-    private Point _lastTarget;
     private Point _randomTarget;
-    private bool _hasLastTarget;
     private bool _isRunning;
 
     public MouseMovementService()
@@ -42,13 +40,11 @@ public sealed class MouseMovementService : IDisposable
         _speed = speed;
         _size = size;
         _phase = 0;
-        _hasLastTarget = false;
 
         NativeMethods.GetCursorPos(out var cursor);
         _roamingCenter = new Point(cursor.X, cursor.Y);
-        _lastTarget = _roamingCenter;
         _centerVelocity = CreateVelocity();
-        _randomTarget = ClampToScreen(_roamingCenter);
+        _randomTarget = CreateRandomTarget();
         _isRunning = true;
         _stopwatch.Restart();
         _timer.Start();
@@ -59,7 +55,6 @@ public sealed class MouseMovementService : IDisposable
         _timer.Stop();
         _stopwatch.Reset();
         _isRunning = false;
-        _hasLastTarget = false;
     }
 
     private void OnTick(object? sender, EventArgs e)
@@ -69,33 +64,23 @@ public sealed class MouseMovementService : IDisposable
             return;
         }
 
-        var dt = Math.Max(0.01, _stopwatch.Elapsed.TotalSeconds);
+        var dt = Math.Clamp(_stopwatch.Elapsed.TotalSeconds, 0.01, 0.08);
         _stopwatch.Restart();
 
         UpdateRoamingCenter(dt);
-        _phase += dt * (0.72 + (_speed * 0.9));
+        _phase += dt * Math.Max(0.9, _speed * 1.8);
 
-        var currentTarget = _pattern == MovementPattern.Random
+        var target = _pattern == MovementPattern.Random
             ? NextRandomPoint()
-            : OffsetFromPattern(_pattern, _phase);
+            : PointAlongPattern(_pattern, _phase);
 
-        if (!_hasLastTarget)
-        {
-            _lastTarget = currentTarget;
-            _hasLastTarget = true;
-            return;
-        }
-
-        var desiredDelta = currentTarget - _lastTarget;
-        _lastTarget = currentTarget;
-
-        GlideDelta(desiredDelta, dt);
+        MoveTowardTarget(target, dt);
     }
 
     private void UpdateRoamingCenter(double dt)
     {
         var bounds = GetVirtualBounds();
-        var margin = _size + 42;
+        var margin = _size + 80;
         var left = bounds.Left + margin;
         var top = bounds.Top + margin;
         var right = bounds.Right - margin;
@@ -118,7 +103,7 @@ public sealed class MouseMovementService : IDisposable
         }
     }
 
-    private Point OffsetFromPattern(MovementPattern pattern, double phase)
+    private Point PointAlongPattern(MovementPattern pattern, double phase)
     {
         var amplitude = _size;
         return pattern switch
@@ -126,23 +111,23 @@ public sealed class MouseMovementService : IDisposable
             MovementPattern.Circle => ClampToScreen(new Point(
                 _roamingCenter.X + (Math.Cos(phase) * amplitude),
                 _roamingCenter.Y + (Math.Sin(phase) * amplitude))),
-            MovementPattern.Square => ClampToScreen(TracePolygon(phase, new[]
+            MovementPattern.Square => ClampToScreen(TracePolygon(phase * 0.38, new[]
             {
                 new Point(-amplitude, -amplitude),
                 new Point(amplitude, -amplitude),
                 new Point(amplitude, amplitude),
                 new Point(-amplitude, amplitude)
             })),
-            MovementPattern.Triangle => ClampToScreen(TracePolygon(phase, new[]
+            MovementPattern.Triangle => ClampToScreen(TracePolygon(phase * 0.44, new[]
             {
                 new Point(0, -amplitude),
-                new Point(amplitude, amplitude * 0.75),
-                new Point(-amplitude, amplitude * 0.75)
+                new Point(amplitude, amplitude * 0.76),
+                new Point(-amplitude, amplitude * 0.76)
             })),
             MovementPattern.Figure8 => ClampToScreen(new Point(
                 _roamingCenter.X + (Math.Sin(phase) * amplitude),
-                _roamingCenter.Y + (Math.Sin(phase * 2) * amplitude * 0.54))),
-            MovementPattern.Parallelogram => ClampToScreen(TracePolygon(phase, new[]
+                _roamingCenter.Y + (Math.Sin(phase * 2) * amplitude * 0.58))),
+            MovementPattern.Parallelogram => ClampToScreen(TracePolygon(phase * 0.36, new[]
             {
                 new Point(-amplitude * 0.72, -amplitude),
                 new Point(amplitude * 0.92, -amplitude),
@@ -153,20 +138,20 @@ public sealed class MouseMovementService : IDisposable
         };
     }
 
-    private Point TracePolygon(double phase, Point[] points)
+    private Point TracePolygon(double progress, Point[] points)
     {
         var loops = points.Length;
-        var normalized = ((phase * 0.38) % loops + loops) % loops;
+        var normalized = ((progress % loops) + loops) % loops;
         var index = (int)Math.Floor(normalized);
         var nextIndex = (index + 1) % loops;
-        var progress = normalized - index;
+        var edgeProgress = normalized - index;
 
         var start = points[index];
         var end = points[nextIndex];
 
         return new Point(
-            _roamingCenter.X + Lerp(start.X, end.X, progress),
-            _roamingCenter.Y + Lerp(start.Y, end.Y, progress));
+            _roamingCenter.X + Lerp(start.X, end.X, edgeProgress),
+            _roamingCenter.Y + Lerp(start.Y, end.Y, edgeProgress));
     }
 
     private Point NextRandomPoint()
@@ -174,7 +159,7 @@ public sealed class MouseMovementService : IDisposable
         var cursor = GetCursorPoint();
         var toTarget = _randomTarget - cursor;
 
-        if (toTarget.Length < 14 || IsNearScreenEdge(cursor, 30))
+        if (toTarget.Length < Math.Max(18, _size * 0.18) || IsNearScreenEdge(cursor, 42))
         {
             _randomTarget = CreateRandomTarget();
         }
@@ -182,48 +167,28 @@ public sealed class MouseMovementService : IDisposable
         return _randomTarget;
     }
 
-    private void GlideDelta(Vector desiredDelta, double dt)
+    private void MoveTowardTarget(Point target, double dt)
     {
-        if (desiredDelta.Length < 0.01)
-        {
-            return;
-        }
-
         var cursor = GetCursorPoint();
-        var idealNext = ClampToScreen(cursor + desiredDelta);
-        var actualDelta = idealNext - cursor;
+        var delta = target - cursor;
+        var distance = delta.Length;
 
-        if (actualDelta.Length < 0.2)
+        if (distance < 0.6)
         {
             return;
         }
 
-        var maxPixelsThisFrame = Math.Max(1.25, (6 + (_speed * 8.5)) * dt * 6);
-        var distance = actualDelta.Length;
-        var direction = actualDelta;
-        direction.Normalize();
-
-        var applied = direction * Math.Min(distance, maxPixelsThisFrame);
-        var stepX = (int)Math.Round(applied.X);
-        var stepY = (int)Math.Round(applied.Y);
-
-        if (stepX == 0 && Math.Abs(applied.X) > 0.2)
-        {
-            stepX = applied.X > 0 ? 1 : -1;
-        }
-
-        if (stepY == 0 && Math.Abs(applied.Y) > 0.2)
-        {
-            stepY = applied.Y > 0 ? 1 : -1;
-        }
-
-        MoveCursorRelative(stepX, stepY);
+        delta.Normalize();
+        var maxPixelsThisFrame = Math.Max(2.4, (110 + (_speed * 155)) * dt);
+        var applied = delta * Math.Min(distance, maxPixelsThisFrame);
+        var nextPoint = ClampToScreen(cursor + applied);
+        MoveCursorAbsolute(nextPoint);
     }
 
     private Point CreateRandomTarget()
     {
         var bounds = GetVirtualBounds();
-        var margin = Math.Max(40, _size * 0.55);
+        var margin = Math.Max(48, _size * 0.6);
         return new Point(
             bounds.Left + margin + (_random.NextDouble() * Math.Max(1, bounds.Width - (margin * 2))),
             bounds.Top + margin + (_random.NextDouble() * Math.Max(1, bounds.Height - (margin * 2))));
@@ -256,7 +221,7 @@ public sealed class MouseMovementService : IDisposable
     private Vector CreateVelocity()
     {
         var angle = _random.NextDouble() * Math.PI * 2;
-        var magnitude = 12 + (_speed * 12);
+        var magnitude = 34 + (_speed * 22);
         return new Vector(Math.Cos(angle) * magnitude, Math.Sin(angle) * magnitude);
     }
 
@@ -269,12 +234,11 @@ public sealed class MouseMovementService : IDisposable
         return new Point(cursor.X, cursor.Y);
     }
 
-    private static void MoveCursorRelative(int dx, int dy)
+    private static void MoveCursorAbsolute(Point target)
     {
-        if (dx == 0 && dy == 0)
-        {
-            return;
-        }
+        var bounds = GetVirtualBounds();
+        var normalizedX = NormalizeAbsoluteCoordinate(target.X, bounds.Left, bounds.Width);
+        var normalizedY = NormalizeAbsoluteCoordinate(target.Y, bounds.Top, bounds.Height);
 
         var input = new NativeMethods.Input
         {
@@ -283,15 +247,21 @@ public sealed class MouseMovementService : IDisposable
             {
                 Mi = new NativeMethods.MouseInput
                 {
-                    Dx = dx,
-                    Dy = dy,
-                    DwFlags = NativeMethods.MouseeventfMove,
+                    Dx = normalizedX,
+                    Dy = normalizedY,
+                    DwFlags = NativeMethods.MouseeventfMove | NativeMethods.MouseeventfAbsolute | NativeMethods.MouseeventfVirtualdesk,
                     DwExtraInfo = NativeMethods.WigglerExtraInfo
                 }
             }
         };
 
         NativeMethods.SendInput(1, [input], Marshal.SizeOf<NativeMethods.Input>());
+    }
+
+    private static int NormalizeAbsoluteCoordinate(double value, double min, double length)
+    {
+        var relative = length <= 1 ? 0 : (value - min) / (length - 1);
+        return (int)Math.Round(Math.Clamp(relative, 0, 1) * 65535.0);
     }
 
     public void Dispose()

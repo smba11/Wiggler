@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 
+const settingsIconUrl = `${import.meta.env.BASE_URL}assets/settings-icon.png`
+
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
 
 const patternConfig = {
@@ -81,7 +83,7 @@ const translations = {
     corePromise: 'Core promise',
     corePromiseValue: 'Idle first. Instant handoff.',
     status: 'Status',
-    armed: 'Armed',
+    armed: 'Ready',
     idleDelay: 'Idle delay',
     pattern: 'Pattern',
     tray: 'Tray',
@@ -936,7 +938,7 @@ const translations = {
     corePromise: '핵심 약속',
     corePromiseValue: '유휴 우선. 즉시 반환.',
     status: '상태',
-    armed: '준비됨',
+    armed: '대기 중',
     idleDelay: '유휴 대기',
     pattern: '패턴',
     tray: '트레이',
@@ -1401,10 +1403,7 @@ function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIs
         aria-expanded={isOpen}
         onClick={() => setIsOpen((current) => !current)}
       >
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3.75 13.62 5.1l2.08-.31.93 1.89 1.99.69-.1 2.11 1.48 1.49-1.11 1.8 1.11 1.8-1.48 1.49.1 2.11-1.99.69-.93 1.89-2.08-.31L12 20.25l-1.62-1.35-2.08.31-.93-1.89-1.99-.69.1-2.11-1.48-1.49 1.11-1.8-1.11-1.8 1.48-1.49-.1-2.11 1.99-.69.93-1.89 2.08.31L12 3.75Z" />
-          <circle cx="12" cy="12" r="3.3" />
-        </svg>
+        <img src={settingsIconUrl} alt="" />
       </button>
 
       {isOpen && (

@@ -2,6 +2,7 @@ namespace WigglerBySmba.Models;
 
 public sealed class AppSettings
 {
+    public string LanguageCode { get; set; } = "en";
     public LaunchMode LaunchMode { get; set; } = LaunchMode.Window;
     public CloseBehavior CloseBehavior { get; set; } = CloseBehavior.MinimizeToTray;
     public int IdleDelaySeconds { get; set; } = 12;

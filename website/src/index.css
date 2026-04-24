@@ -17,6 +17,8 @@
   --trail-strong: rgba(24, 31, 41, 0.2);
   --wash: rgba(176, 189, 205, 0.18);
   --wash-strong: rgba(126, 146, 168, 0.16);
+  --icon-filter: brightness(0) saturate(100%) invert(8%) sepia(11%) saturate(900%) hue-rotate(182deg) brightness(94%) contrast(92%);
+  --icon-filter-active: brightness(0) saturate(100%) invert(100%);
 
   font-family: var(--font-sans);
   line-height: 1.5;
@@ -45,6 +47,8 @@
   --trail-strong: rgba(240, 244, 252, 0.24);
   --wash: rgba(115, 145, 181, 0.18);
   --wash-strong: rgba(108, 140, 182, 0.18);
+  --icon-filter: brightness(0) saturate(100%) invert(94%) sepia(11%) saturate(328%) hue-rotate(180deg) brightness(103%) contrast(96%);
+  --icon-filter-active: brightness(0) saturate(100%) invert(8%) sepia(11%) saturate(900%) hue-rotate(182deg) brightness(94%) contrast(92%);
 }
 
 :root[data-vibe='tide'] {

@@ -19,4 +19,8 @@
     <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Resource Include="Assets\settings-icon.png" />
+  </ItemGroup>
+
 </Project>

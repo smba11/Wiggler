@@ -1,43 +1,51 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows;
+using WigglerBySmba.Services;
 
 namespace WigglerBySmba;
 
 public partial class TutorialWindow : Window, INotifyPropertyChanged
 {
-    private readonly List<TutorialPage> _pages =
-    [
-        new("A calm mouse wiggler with boundaries.",
-            "Turn WIGGLER on, step away, and it waits until you have actually been idle before it takes over.",
-            "It stays friendly by arming first, then moving only after the idle timer expires."),
-        new("Turning it on is the whole flow.",
-            "Use the main power button to arm it. While armed, WIGGLER watches for real user input and stays out of your way.",
-            "The default idle delay is 12 seconds, and you can change that anytime in Settings."),
-        new("Patterns stay visible and controlled.",
-            "Choose Circle, Square, Triangle, Figure 8, Parallelogram, or Random.",
-            "Patterns stay on-screen, redirect near edges, and travel smoothly over time instead of jumping around."),
-        new("You always win instantly.",
-            "The moment you move the mouse yourself, WIGGLER stops immediately and returns to the armed state.",
-            "Its own movement is tagged and ignored, so it never mistakes itself for your input."),
-        new("Tray support keeps it tucked away.",
-            "Run it in the background, reopen it from the tray, and replay this tutorial any time from Settings.",
-            "You can choose whether the app launches in a window or the tray, and whether closing hides it or exits.")
-    ];
-
+    private readonly List<AppLocalizationService.TutorialPageText> _pages;
+    private readonly string _languageCode;
     private int _pageIndex;
     private string _titleText = string.Empty;
     private string _bodyText = string.Empty;
     private string _detailText = string.Empty;
 
-    public TutorialWindow()
+    public TutorialWindow(string languageCode)
     {
+        _languageCode = languageCode;
+        var localization = new AppLocalizationService();
+        _pages = localization.GetPack(languageCode).TutorialPages?.ToList()
+            ?? localization.GetPack("en").TutorialPages!.ToList();
+
         InitializeComponent();
         DataContext = this;
         RefreshPage();
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string WindowTitle => _languageCode switch
+    {
+        "es" => "Bienvenido a WIGGLER by SMBA",
+        "pt" => "Bem-vindo ao WIGGLER by SMBA",
+        "fr" => "Bienvenue sur WIGGLER by SMBA",
+        "de" => "Willkommen bei WIGGLER by SMBA",
+        "it" => "Benvenuto in WIGGLER by SMBA",
+        "nl" => "Welkom bij WIGGLER by SMBA",
+        "sv" => "Välkommen till WIGGLER by SMBA",
+        "ja" => "WIGGLER by SMBA へようこそ",
+        "ko" => "WIGGLER by SMBA에 오신 것을 환영합니다",
+        "zh" => "欢迎使用 WIGGLER by SMBA",
+        "ar" => "مرحباً بك في WIGGLER by SMBA",
+        "hi" => "WIGGLER by SMBA में आपका स्वागत है",
+        _ => "Welcome to WIGGLER by SMBA"
+    };
+
+    public string BrandText => "WIGGLER by SMBA";
 
     public string TitleText
     {
@@ -69,9 +77,58 @@ public partial class TutorialWindow : Window, INotifyPropertyChanged
         }
     }
 
-    public string ProgressText => $"{_pageIndex + 1} of {_pages.Count}";
+    public string ProgressText => $"{_pageIndex + 1} / {_pages.Count}";
 
-    public string NextButtonText => _pageIndex == _pages.Count - 1 ? "Finish" : "Next";
+    public string BackButtonText => _languageCode switch
+    {
+        "es" => "Atrás",
+        "pt" => "Voltar",
+        "fr" => "Retour",
+        "de" => "Zurück",
+        "it" => "Indietro",
+        "nl" => "Terug",
+        "sv" => "Tillbaka",
+        "ja" => "戻る",
+        "ko" => "뒤로",
+        "zh" => "返回",
+        "ar" => "رجوع",
+        "hi" => "पीछे",
+        _ => "Back"
+    };
+
+    public string NextButtonText => _pageIndex == _pages.Count - 1
+        ? _languageCode switch
+        {
+            "es" => "Finalizar",
+            "pt" => "Concluir",
+            "fr" => "Terminer",
+            "de" => "Fertig",
+            "it" => "Fine",
+            "nl" => "Afronden",
+            "sv" => "Slutför",
+            "ja" => "完了",
+            "ko" => "완료",
+            "zh" => "完成",
+            "ar" => "إنهاء",
+            "hi" => "समाप्त",
+            _ => "Finish"
+        }
+        : _languageCode switch
+        {
+            "es" => "Siguiente",
+            "pt" => "Próximo",
+            "fr" => "Suivant",
+            "de" => "Weiter",
+            "it" => "Avanti",
+            "nl" => "Volgende",
+            "sv" => "Nästa",
+            "ja" => "次へ",
+            "ko" => "다음",
+            "zh" => "继续",
+            "ar" => "التالي",
+            "hi" => "आगे",
+            _ => "Next"
+        };
 
     private void RefreshPage()
     {
@@ -79,7 +136,9 @@ public partial class TutorialWindow : Window, INotifyPropertyChanged
         TitleText = page.Title;
         BodyText = page.Body;
         DetailText = page.Detail;
+        OnPropertyChanged(nameof(WindowTitle));
         OnPropertyChanged(nameof(ProgressText));
+        OnPropertyChanged(nameof(BackButtonText));
         OnPropertyChanged(nameof(NextButtonText));
     }
 
@@ -109,6 +168,4 @@ public partial class TutorialWindow : Window, INotifyPropertyChanged
 
     private void OnPropertyChanged([CallerMemberName] string? propertyName = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-
-    private sealed record TutorialPage(string Title, string Body, string Detail);
 }

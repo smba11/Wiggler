@@ -93,7 +93,7 @@ public partial class MainWindow : Window
             RevealWindow();
         }
 
-        var tutorialWindow = new TutorialWindow
+        var tutorialWindow = new TutorialWindow(_viewModel.SelectedLanguageCode)
         {
             Owner = this
         };

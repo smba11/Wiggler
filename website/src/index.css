@@ -1,27 +1,102 @@
 :root {
+  --font-sans: 'Segoe UI', 'Aptos', 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Century Gothic', 'Aptos', 'Segoe UI', sans-serif;
   --canvas: #f6f3ee;
   --panel: rgba(255, 255, 255, 0.68);
   --panel-strong: rgba(255, 255, 255, 0.84);
+  --surface: rgba(255, 255, 255, 0.8);
+  --surface-soft: rgba(255, 255, 255, 0.72);
   --chip: rgba(255, 255, 255, 0.86);
   --ink: #171b23;
   --muted: #8d94a3;
   --muted-strong: #5a6270;
   --line: rgba(23, 27, 35, 0.08);
-  --font-sans: 'Segoe UI', 'Aptos', 'Helvetica Neue', Arial, sans-serif;
-  --font-display: 'Trebuchet MS', 'Aptos', 'Segoe UI', sans-serif;
+  --surface-line: rgba(24, 31, 41, 0.08);
+  --grid-line: rgba(24, 31, 41, 0.08);
+  --trail: rgba(24, 31, 41, 0.16);
+  --trail-strong: rgba(24, 31, 41, 0.2);
+  --wash: rgba(176, 189, 205, 0.18);
+  --wash-strong: rgba(126, 146, 168, 0.16);
 
   font-family: var(--font-sans);
   line-height: 1.5;
   font-weight: 400;
   color: var(--ink);
-  background:
-    radial-gradient(circle at top left, rgba(164, 173, 184, 0.12), transparent 30%),
-    radial-gradient(circle at 80% 20%, rgba(193, 199, 207, 0.16), transparent 22%),
-    linear-gradient(180deg, #fcfbf8, var(--canvas));
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  --canvas: #12161d;
+  --panel: rgba(22, 28, 37, 0.76);
+  --panel-strong: rgba(24, 31, 41, 0.92);
+  --surface: rgba(28, 35, 46, 0.9);
+  --surface-soft: rgba(24, 31, 41, 0.82);
+  --chip: rgba(30, 38, 50, 0.94);
+  --ink: #f3f6fa;
+  --muted: #aab4c4;
+  --muted-strong: #d7deea;
+  --line: rgba(240, 244, 252, 0.08);
+  --surface-line: rgba(240, 244, 252, 0.12);
+  --grid-line: rgba(240, 244, 252, 0.09);
+  --trail: rgba(240, 244, 252, 0.16);
+  --trail-strong: rgba(240, 244, 252, 0.24);
+  --wash: rgba(115, 145, 181, 0.18);
+  --wash-strong: rgba(108, 140, 182, 0.18);
+}
+
+:root[data-vibe='tide'] {
+  --wash: rgba(140, 177, 196, 0.22);
+  --wash-strong: rgba(104, 153, 178, 0.2);
+}
+
+:root[data-vibe='ember'] {
+  --wash: rgba(214, 159, 124, 0.22);
+  --wash-strong: rgba(198, 123, 88, 0.2);
+}
+
+:root[data-vibe='dusk'] {
+  --wash: rgba(166, 144, 200, 0.22);
+  --wash-strong: rgba(125, 110, 174, 0.2);
+}
+
+:root[data-theme='dark'][data-vibe='tide'] {
+  --panel: rgba(15, 31, 39, 0.8);
+  --panel-strong: rgba(17, 38, 48, 0.94);
+  --surface: rgba(20, 44, 55, 0.9);
+  --surface-soft: rgba(18, 35, 44, 0.84);
+}
+
+:root[data-theme='dark'][data-vibe='ember'] {
+  --panel: rgba(37, 24, 20, 0.8);
+  --panel-strong: rgba(46, 28, 23, 0.94);
+  --surface: rgba(53, 31, 26, 0.9);
+  --surface-soft: rgba(43, 27, 23, 0.84);
+}
+
+:root[data-theme='dark'][data-vibe='dusk'] {
+  --panel: rgba(28, 22, 39, 0.8);
+  --panel-strong: rgba(33, 26, 46, 0.94);
+  --surface: rgba(40, 31, 58, 0.9);
+  --surface-soft: rgba(31, 25, 45, 0.84);
+}
+
+:root[data-contrast='high'] {
+  --line: rgba(23, 27, 35, 0.18);
+  --surface-line: rgba(24, 31, 41, 0.2);
+  --grid-line: rgba(24, 31, 41, 0.18);
+  --trail: rgba(24, 31, 41, 0.28);
+  --trail-strong: rgba(24, 31, 41, 0.42);
+}
+
+:root[data-theme='dark'][data-contrast='high'] {
+  --line: rgba(240, 244, 252, 0.2);
+  --surface-line: rgba(240, 244, 252, 0.24);
+  --grid-line: rgba(240, 244, 252, 0.2);
+  --trail: rgba(240, 244, 252, 0.3);
+  --trail-strong: rgba(240, 244, 252, 0.42);
 }
 
 * {
@@ -36,6 +111,10 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, var(--wash), transparent 30%),
+    radial-gradient(circle at 80% 20%, var(--wash-strong), transparent 22%),
+    linear-gradient(180deg, color-mix(in srgb, var(--canvas) 78%, white), var(--canvas));
 }
 
 body::before {
@@ -44,7 +123,7 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0.36)),
+    linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08)),
     repeating-linear-gradient(
       135deg,
       transparent 0,
@@ -52,7 +131,19 @@ body::before {
       rgba(19, 24, 33, 0.018) 18px,
       rgba(19, 24, 33, 0.018) 19px
     );
-  opacity: 0.8;
+  opacity: 0.65;
+}
+
+:root[data-theme='dark'] body::before {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.02)),
+    repeating-linear-gradient(
+      135deg,
+      transparent 0,
+      transparent 18px,
+      rgba(255, 255, 255, 0.018) 18px,
+      rgba(255, 255, 255, 0.018) 19px
+    );
 }
 
 a {

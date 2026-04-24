@@ -1,19 +1,81 @@
+import { useState } from 'react'
 import './App.css'
 
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
 
+const patternConfig = {
+  Circle: {
+    outline: <circle className="path-stroke" cx="320" cy="196" r="94" />,
+    motionPath: 'M 226 196 a 94 94 0 1 1 188 0 a 94 94 0 1 1 -188 0',
+    duration: '7.5s',
+    label: 'A smooth continuous orbit.',
+  },
+  Square: {
+    outline: <path className="path-stroke" d="M 218 104 L 422 104 L 422 308 L 218 308 Z" />,
+    motionPath: 'M 218 104 L 422 104 L 422 308 L 218 308 Z',
+    duration: '8.5s',
+    label: 'Straight edges with clean turns.',
+  },
+  Triangle: {
+    outline: <path className="path-stroke" d="M 320 92 L 454 310 L 186 310 Z" />,
+    motionPath: 'M 320 92 L 454 310 L 186 310 Z',
+    duration: '7.8s',
+    label: 'Three-sided travel with visible peaks.',
+  },
+  'Figure 8': {
+    outline: (
+      <path
+        className="path-stroke"
+        d="M 198 194
+           C 198 116, 308 118, 320 194
+           C 332 270, 442 272, 442 194
+           C 442 116, 332 118, 320 194
+           C 308 270, 198 272, 198 194 Z"
+      />
+    ),
+    motionPath:
+      'M 198 194 C 198 116, 308 118, 320 194 C 332 270, 442 272, 442 194 C 442 116, 332 118, 320 194 C 308 270, 198 272, 198 194 Z',
+    duration: '9.2s',
+    label: 'A looping crossover that feels more playful.',
+  },
+  Parallelogram: {
+    outline: <path className="path-stroke" d="M 234 108 L 448 108 L 394 302 L 180 302 Z" />,
+    motionPath: 'M 234 108 L 448 108 L 394 302 L 180 302 Z',
+    duration: '8.1s',
+    label: 'Offset geometry with a cleaner diagonal stance.',
+  },
+  Random: {
+    outline: (
+      <path
+        className="path-stroke random-outline"
+        d="M 132 286
+           L 222 142
+           L 338 250
+           L 470 118
+           L 528 272
+           L 384 322
+           L 254 194
+           L 164 302"
+      />
+    ),
+    motionPath: 'M 132 286 L 222 142 L 338 250 L 470 118 L 528 272 L 384 322 L 254 194 L 164 302',
+    duration: '8.8s',
+    label: 'Roaming points that still stay bounded.',
+  },
+}
+
 const features = [
   {
     title: 'Idle-first control',
-    body: 'WIGGLER stays armed in the background and only starts moving after you have been idle.',
+    body: 'WIGGLER stays armed in the background and only starts moving after you have really been idle.',
   },
   {
     title: 'Instant handoff',
-    body: 'The second you touch the mouse, the desktop app stops and gives full control back.',
+    body: 'The second you touch the mouse, the desktop app stops and gives control back immediately.',
   },
   {
     title: 'Bounded motion',
-    body: 'Patterns stay visible, on-screen, and deliberate instead of drifting off the edge.',
+    body: 'Patterns stay visible, on-screen, and intentional instead of drifting off the edge.',
   },
 ]
 
@@ -21,21 +83,24 @@ const faqs = [
   {
     question: 'Can the website move my real mouse?',
     answer:
-      'No. Browsers cannot control your system mouse. The website is for the brand, product story, and a visual demo. The desktop app is the real utility.',
+      'No. Browsers cannot control your system mouse. The website is for the brand, product story, and a live visual demo. The desktop app is the real utility.',
   },
   {
     question: 'What patterns does WIGGLER support?',
     answer:
-      'Circle, Square, Triangle, Figure 8, Parallelogram, and Random are all supported in the desktop app.',
+      'Circle, Square, Triangle, Figure 8, Parallelogram, and Random are all supported in the desktop app and mirrored in the website demo.',
   },
   {
-    question: 'Does it keep running in the tray?',
+    question: 'What is the best way to distribute the app?',
     answer:
-      'Yes. The desktop app can launch in the tray, minimize to the tray, and keep running while the main window is hidden.',
+      'GitHub Releases is the cleanest place for the Windows build. It keeps the executable out of normal repo history and gives you a proper download page.',
   },
 ]
 
 function PatternDemo() {
+  const [selectedPattern, setSelectedPattern] = useState('Circle')
+  const activePattern = patternConfig[selectedPattern]
+
   return (
     <div className="demo-card">
       <div className="demo-grid" aria-hidden="true">
@@ -45,77 +110,57 @@ function PatternDemo() {
         <span />
       </div>
 
+      <div className="demo-toolbar">
+        <div>
+          <p className="eyebrow">Browser demo</p>
+          <h3>Choose a path and watch the cursor trace it.</h3>
+          <p>{activePattern.label}</p>
+        </div>
+
+        <div className="demo-pills" role="tablist" aria-label="Choose a cursor pattern">
+          {patterns.map((pattern) => (
+            <button
+              key={pattern}
+              type="button"
+              className={`demo-pill ${pattern === selectedPattern ? 'is-active' : ''}`}
+              onClick={() => setSelectedPattern(pattern)}
+            >
+              {pattern}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <svg
+        key={selectedPattern}
         className="demo-svg"
         viewBox="0 0 640 420"
         role="img"
-        aria-label="Animated preview of cursor motion patterns inside the browser"
+        aria-label={`Animated preview of the ${selectedPattern} cursor pattern`}
       >
         <defs>
-          <path
-            id="circle-path"
-            d="M 184 210
-               a 82 82 0 1 1 164 0
-               a 82 82 0 1 1 -164 0"
-          />
-          <path
-            id="square-path"
-            d="M 378 128 L 508 128 L 508 292 L 378 292 Z"
-          />
+          <path id="selected-path" d={activePattern.motionPath} />
           <path
             id="trail-path"
-            d="M 96 178
-               C 142 224, 184 118, 238 178
-               S 334 236, 390 186
-               S 482 114, 546 178"
+            d="M 92 164 C 132 204, 178 116, 236 170 S 332 230, 392 178 S 488 116, 548 166"
           />
         </defs>
 
-        <path className="demo-trail" d="M 96 178 C 142 224, 184 118, 238 178 S 334 236, 390 186 S 482 114, 546 178" />
+        <path className="demo-trail" d="M 92 164 C 132 204, 178 116, 236 170 S 332 230, 392 178 S 488 116, 548 166" />
+        {activePattern.outline}
 
-        <g className="orbit orbit-circle">
-          <circle className="path-stroke" cx="266" cy="210" r="82" />
-          <g className="cursor-group">
-            <animateMotion dur="8s" repeatCount="indefinite" rotate="auto">
-              <mpath href="#circle-path" />
-            </animateMotion>
-            <path
-              className="cursor-shape"
-              d="M0 0 L40 16 L18 26 L28 46 L16 52 L6 30 L-2 48 L-10 44 L-2 18 Z"
-            />
-            <path className="cursor-ring" d="M 8 -20 Q 18 -34 34 -34" />
-            <path className="cursor-ring delay" d="M 18 -8 Q 32 -24 48 -24" />
-          </g>
-        </g>
-
-        <g className="orbit orbit-square">
-          <path className="path-stroke" d="M 378 128 L 508 128 L 508 292 L 378 292 Z" />
-          <g className="cursor-group secondary">
-            <animateMotion dur="10s" repeatCount="indefinite" rotate="auto">
-              <mpath href="#square-path" />
-            </animateMotion>
-            <path
-              className="cursor-shape"
-              d="M0 0 L30 12 L14 20 L22 36 L13 40 L6 24 L0 38 L-7 34 L0 14 Z"
-            />
-          </g>
-        </g>
-
-        <g className="orbit orbit-random">
-          <circle className="demo-dot demo-dot-a" cx="144" cy="308" r="7" />
-          <circle className="demo-dot demo-dot-b" cx="256" cy="332" r="7" />
-          <circle className="demo-dot demo-dot-c" cx="480" cy="98" r="7" />
+        <g className="cursor-group">
+          <animateMotion dur={activePattern.duration} repeatCount="indefinite" rotate="auto">
+            <mpath href="#selected-path" />
+          </animateMotion>
+          <path
+            className="cursor-shape"
+            d="M0 0 L40 16 L18 26 L28 46 L16 52 L6 30 L-2 48 L-10 44 L-2 18 Z"
+          />
+          <path className="cursor-ring" d="M 8 -20 Q 18 -34 34 -34" />
+          <path className="cursor-ring delay" d="M 18 -8 Q 32 -24 48 -24" />
         </g>
       </svg>
-
-      <div className="demo-copy">
-        <p className="eyebrow">Browser demo</p>
-        <h3>The site shows the feel. The desktop app does the real work.</h3>
-        <p>
-          This preview simulates smooth cursor paths in the browser. The actual Windows utility is
-          what arms itself, waits for idle time, and takes over only when you have stepped away.
-        </p>
-      </div>
     </div>
   )
 }
@@ -125,17 +170,23 @@ function App() {
     <div className="site-shell">
       <header className="topbar">
         <div className="brand-lockup" aria-label="WIGGLER by SMBA">
-          <div className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 180 80">
-              <path d="M 8 42 C 28 62, 46 20, 70 42 S 112 62, 136 42" />
-              <path d="M 134 18 Q 144 6 158 8" />
-              <path d="M 142 24 Q 154 12 168 16" />
-              <path d="M 146 18 L 176 30 L 158 40 L 168 56 L 156 62 L 144 42 L 136 58 L 126 54 L 132 34 Z" />
-            </svg>
-          </div>
-          <div>
-            <p className="wordmark">WIGGLER</p>
-            <p className="submark">by smba</p>
+          <div className="brand-stack">
+            <div className="brand-mark" aria-hidden="true">
+              <svg viewBox="0 0 220 108">
+                <path d="M 18 52 C 38 74, 60 28, 88 52 S 140 74, 170 52" />
+                <path d="M 162 18 Q 174 2 194 4" />
+                <path d="M 168 30 Q 184 12 204 18" />
+                <path d="M 170 20 L 214 40 L 188 56 L 208 78 L 196 90 L 176 66 L 162 92 L 146 84 L 160 48 Z" />
+              </svg>
+            </div>
+            <div className="wordmark-wrap">
+              <p className="wordmark">WIGGLER</p>
+              <div className="submark-row">
+                <span />
+                <p className="submark">by smba</p>
+                <span />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -165,11 +216,11 @@ function App() {
               </a>
               <a
                 className="button ghost"
-                href="https://github.com/smba11/Wiggler"
+                href="https://github.com/smba11/Wiggler/releases"
                 target="_blank"
                 rel="noreferrer"
               >
-                View GitHub repo
+                Desktop downloads
               </a>
             </div>
 
@@ -244,7 +295,7 @@ function App() {
         <section className="demo-section" id="demo">
           <div className="section-heading">
             <p className="eyebrow">Interactive preview</p>
-            <h2>A web demo for the idea. A desktop app for the job.</h2>
+            <h2>Pick the exact shape and preview the motion.</h2>
             <p>
               Browsers cannot move your real system mouse, so this page focuses on the experience,
               the motion language, and the brand story.
@@ -256,20 +307,20 @@ function App() {
         <section className="cta-section">
           <div className="cta-card">
             <div>
-              <p className="eyebrow">Open source home</p>
-              <h2>Build the brand here. Ship the utility from the desktop app.</h2>
+              <p className="eyebrow">Desktop delivery</p>
+              <h2>The next step is a proper GitHub release for the Windows build.</h2>
               <p>
-                The repo can now hold both pieces: the Windows utility and this website. That makes
-                GitHub the clean place for docs, screenshots, release notes, and future downloads.
+                The clean way to distribute the app is through GitHub Releases. That gives you a real
+                download page without bloating the repo with a 170 MB executable.
               </p>
             </div>
             <a
               className="button primary"
-              href="https://github.com/smba11/Wiggler"
+              href="https://github.com/smba11/Wiggler/releases"
               target="_blank"
               rel="noreferrer"
             >
-              Open the repo
+              Open releases
             </a>
           </div>
         </section>

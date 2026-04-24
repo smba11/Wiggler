@@ -15,12 +15,17 @@
 .brand-lockup {
   display: flex;
   align-items: center;
+}
+
+.brand-stack {
+  display: flex;
+  align-items: center;
   gap: 16px;
 }
 
 .brand-mark {
-  width: 88px;
-  height: 56px;
+  width: 104px;
+  height: 64px;
 }
 
 .brand-mark svg {
@@ -40,17 +45,35 @@
   margin: 0;
 }
 
+.wordmark-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .wordmark {
   font-family: var(--font-display);
-  font-size: 1.25rem;
-  letter-spacing: 0.32rem;
+  font-size: 1.75rem;
+  letter-spacing: 0.42rem;
   color: var(--ink);
 }
 
+.submark-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 0.38rem;
+}
+
+.submark-row span {
+  width: 56px;
+  height: 1px;
+  background: rgba(141, 148, 163, 0.85);
+}
+
 .submark {
-  margin-top: 0.2rem;
-  font-size: 0.95rem;
-  letter-spacing: 0.12rem;
+  font-size: 0.96rem;
+  letter-spacing: 0.18rem;
   text-transform: lowercase;
   color: var(--muted);
 }
@@ -144,10 +167,10 @@
 .hero-body,
 .patterns-copy p,
 .section-heading p,
-.demo-copy p,
 .cta-card p,
 .faq-item p,
-.feature-card p:last-child {
+.feature-card p:last-child,
+.demo-toolbar p:last-child {
   color: var(--muted-strong);
 }
 
@@ -328,6 +351,56 @@
   overflow: hidden;
 }
 
+.demo-toolbar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  align-items: end;
+  padding: 6px 8px 10px;
+}
+
+.demo-toolbar h3 {
+  margin: 10px 0 8px;
+  font-size: 1.75rem;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+.demo-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.demo-pill {
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(24, 31, 41, 0.1);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    background-color 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.demo-pill:hover {
+  transform: translateY(-1px);
+}
+
+.demo-pill.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--canvas);
+}
+
 .demo-grid {
   position: absolute;
   inset: 0;
@@ -386,28 +459,8 @@
   opacity: 0.65;
 }
 
-.demo-dot {
-  fill: rgba(24, 31, 41, 0.22);
-  animation: pulse 2.6s ease-in-out infinite;
-}
-
-.demo-dot-b {
-  animation-delay: 0.5s;
-}
-
-.demo-dot-c {
-  animation-delay: 1s;
-}
-
-.demo-copy {
-  position: relative;
-  z-index: 1;
-  margin-top: 10px;
-  padding: 0 8px 8px;
-}
-
-.demo-copy h3 {
-  max-width: 18ch;
+.random-outline {
+  stroke-dasharray: 8 10;
 }
 
 .cta-card {
@@ -439,7 +492,8 @@
   .topbar,
   .hero,
   .patterns-section,
-  .cta-card {
+  .cta-card,
+  .demo-toolbar {
     grid-template-columns: 1fr;
   }
 
@@ -460,6 +514,10 @@
   }
 
   .pattern-pills {
+    justify-content: flex-start;
+  }
+
+  .demo-pills {
     justify-content: flex-start;
   }
 }

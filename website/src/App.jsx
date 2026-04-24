@@ -58,352 +58,248 @@ const patternConfig = {
   },
 }
 
-const copy = {
-  en: {
-    navFeatures: 'Features',
-    navDemo: 'Demo',
-    navSettings: 'Settings',
-    navFaq: 'FAQ',
-    navGithub: 'GitHub',
-    heroEyebrow: 'Desktop utility, now with a home on the web',
-    heroTitle: 'Keep the session alive without fighting the user.',
-    heroBody:
-      'WIGGLER by SMBA is a lightweight Windows app that waits for idle time, then moves the cursor in clean, bounded shapes until you touch the mouse again.',
-    watchDemo: 'Watch the demo',
-    desktopDownloads: 'Desktop downloads',
-    bestFor: 'Best for',
-    bestForValue: 'Windows desktop workflows',
-    corePromise: 'Core promise',
-    corePromiseValue: 'Idle first. Instant handoff.',
-    status: 'Status',
-    armed: 'Armed',
-    idleDelay: 'Idle delay',
-    pattern: 'Pattern',
-    tray: 'Tray',
-    ready: 'Ready',
-    surfaceFootOne: 'The desktop app takes over only after inactivity.',
-    surfaceFootTwo: 'Your mouse wins instantly.',
-    featureEyebrow: 'Feature',
-    features: [
-      {
-        title: 'Idle-first control',
-        body: 'WIGGLER stays armed in the background and only starts moving after you have really been idle.',
-      },
-      {
-        title: 'Instant handoff',
-        body: 'The second you touch the mouse, the desktop app stops and gives control back immediately.',
-      },
-      {
-        title: 'Bounded motion',
-        body: 'Patterns stay visible, on-screen, and intentional instead of drifting off the edge.',
-      },
-    ],
-    motionEyebrow: 'Motion library',
-    motionTitle: 'Visible patterns, quiet behavior.',
-    motionBody:
-      'The desktop app supports six movement styles and stays within screen bounds while it roams. The site mirrors that motion language without pretending to control your real system cursor.',
-    demoEyebrow: 'Interactive preview',
-    demoTitle: 'Pick the exact shape and preview the motion.',
-    demoBody:
-      'Browsers cannot move your real system mouse, so this page focuses on the experience, the motion language, and the brand story.',
-    browserDemo: 'Browser demo',
-    demoChooserTitle: 'Choose a path and watch the cursor trace it.',
-    settingsEyebrow: 'Settings preview',
-    settingsTitle: 'Tune the site the way the desktop app should feel.',
-    settingsBody:
-      'Theme, language, palette, and motion controls are all here so the website feels closer to a real product surface instead of a static landing page.',
-    appearance: 'Appearance',
-    theme: 'Theme',
-    vibe: 'Color vibe',
-    language: 'Language',
-    comfort: 'Comfort',
-    motionSpeed: 'Demo speed',
-    motionSpeedLabel: 'Playback',
-    reduceMotion: 'Reduce motion',
-    highContrast: 'High contrast',
-    on: 'On',
-    off: 'Off',
-    themeOptions: { auto: 'Auto', light: 'Light', dark: 'Dark' },
-    vibeOptions: { porcelain: 'Porcelain', tide: 'Tide', ember: 'Ember', dusk: 'Dusk' },
-    languageOptions: { en: 'English', es: 'Spanish', pt: 'Portuguese' },
-    speedOptions: { slow: 'Slow', normal: 'Normal', brisk: 'Brisk' },
-    ctaEyebrow: 'Desktop delivery',
-    ctaTitle: 'The next step is a proper GitHub release for the Windows build.',
-    ctaBody:
-      'The clean way to distribute the app is through GitHub Releases. That gives you a real download page without bloating the repo with a large executable.',
-    openReleases: 'Open releases',
-    faqEyebrow: 'FAQ',
-    faqTitle: 'Common questions',
-    faqs: [
-      {
-        question: 'Can the website move my real mouse?',
-        answer:
-          'No. Browsers cannot control your system mouse. The website is for the brand, product story, and a live visual demo. The desktop app is the real utility.',
-      },
-      {
-        question: 'What patterns does WIGGLER support?',
-        answer:
-          'Circle, Square, Triangle, Figure 8, Parallelogram, and Random are all supported in the desktop app and mirrored in the website demo.',
-      },
-      {
-        question: 'What is the best way to distribute the app?',
-        answer:
-          'GitHub Releases is the cleanest place for the Windows build. It keeps the executable out of normal repo history and gives you a proper download page.',
-      },
-    ],
-    patternLabels: {
-      Circle: 'A smooth continuous orbit.',
-      Square: 'Straight edges with clean turns.',
-      Triangle: 'Three-sided travel with visible peaks.',
-      'Figure 8': 'A looping crossover that feels more playful.',
-      Parallelogram: 'Offset geometry with a cleaner diagonal stance.',
-      Random: 'Roaming points that still stay bounded.',
+const baseCopy = {
+  navFeatures: 'Features',
+  navDemo: 'Demo',
+  navFaq: 'FAQ',
+  navGithub: 'GitHub',
+  settings: 'Settings',
+  theme: 'Theme',
+  language: 'Language',
+  light: 'Light',
+  dark: 'Dark',
+  heroEyebrow: 'Desktop utility, now with a home on the web',
+  heroTitle: 'Keep the session alive without fighting the user.',
+  heroBody:
+    'WIGGLER by SMBA is a lightweight Windows app that waits for idle time, then moves the cursor in clean, bounded shapes until you touch the mouse again.',
+  watchDemo: 'Watch the demo',
+  desktopDownloads: 'Desktop downloads',
+  bestFor: 'Best for',
+  bestForValue: 'Windows desktop workflows',
+  corePromise: 'Core promise',
+  corePromiseValue: 'Idle first. Instant handoff.',
+  status: 'Status',
+  armed: 'Armed',
+  idleDelay: 'Idle delay',
+  pattern: 'Pattern',
+  tray: 'Tray',
+  ready: 'Ready',
+  surfaceFootOne: 'The desktop app takes over only after inactivity.',
+  surfaceFootTwo: 'Your mouse wins instantly.',
+  featureEyebrow: 'Feature',
+  features: [
+    {
+      title: 'Idle-first control',
+      body: 'WIGGLER stays armed in the background and only starts moving after you have really been idle.',
     },
+    {
+      title: 'Instant handoff',
+      body: 'The second you touch the mouse, the desktop app stops and gives control back immediately.',
+    },
+    {
+      title: 'Bounded motion',
+      body: 'Patterns stay visible, on-screen, and intentional instead of drifting off the edge.',
+    },
+  ],
+  motionEyebrow: 'Motion library',
+  motionTitle: 'Visible patterns, quiet behavior.',
+  motionBody:
+    'The desktop app supports six movement styles and stays within screen bounds while it roams. The site mirrors that motion language without pretending to control your real system cursor.',
+  demoEyebrow: 'Interactive preview',
+  demoTitle: 'Pick the exact shape and preview the motion.',
+  demoBody:
+    'Browsers cannot move your real system mouse, so this page focuses on the experience, the motion language, and the brand story.',
+  browserDemo: 'Browser demo',
+  demoChooserTitle: 'Choose a path and watch the cursor trace it.',
+  ctaEyebrow: 'Desktop delivery',
+  ctaTitle: 'The next step is a proper GitHub release for the Windows build.',
+  ctaBody:
+    'The clean way to distribute the app is through GitHub Releases. That gives you a real download page without bloating the repo with a large executable.',
+  openReleases: 'Open releases',
+  faqEyebrow: 'FAQ',
+  faqTitle: 'Common questions',
+  faqs: [
+    {
+      question: 'Can the website move my real mouse?',
+      answer:
+        'No. Browsers cannot control your system mouse. The website is for the brand, product story, and a live visual demo. The desktop app is the real utility.',
+    },
+    {
+      question: 'What patterns does WIGGLER support?',
+      answer:
+        'Circle, Square, Triangle, Figure 8, Parallelogram, and Random are all supported in the desktop app and mirrored in the website demo.',
+    },
+    {
+      question: 'What is the best way to distribute the app?',
+      answer:
+        'GitHub Releases is the cleanest place for the Windows build. It keeps the executable out of normal repo history and gives you a proper download page.',
+    },
+  ],
+  patternLabels: {
+    Circle: 'A smooth continuous orbit.',
+    Square: 'Straight edges with clean turns.',
+    Triangle: 'Three-sided travel with visible peaks.',
+    'Figure 8': 'A looping crossover that feels more playful.',
+    Parallelogram: 'Offset geometry with a cleaner diagonal stance.',
+    Random: 'Roaming points that still stay bounded.',
   },
+}
+
+const languageOptions = {
+  en: 'English',
+  es: 'Espanol',
+  pt: 'Portugues',
+  fr: 'Francais',
+  de: 'Deutsch',
+  it: 'Italiano',
+  nl: 'Nederlands',
+  sv: 'Svenska',
+  ja: 'Japanese',
+  ko: 'Korean',
+  zh: 'Chinese',
+  ar: 'Arabic',
+  hi: 'Hindi',
+}
+
+const languageOverrides = {
   es: {
     navFeatures: 'Funciones',
-    navDemo: 'Demo',
-    navSettings: 'Ajustes',
-    navFaq: 'FAQ',
-    navGithub: 'GitHub',
-    heroEyebrow: 'Utilidad de escritorio, ahora con un hogar en la web',
-    heroTitle: 'Mantiene la sesion activa sin pelear con la persona.',
-    heroBody:
-      'WIGGLER by SMBA es una app ligera para Windows que espera el tiempo inactivo y luego mueve el cursor en formas limpias y limitadas hasta que vuelves a tocar el mouse.',
-    watchDemo: 'Ver demo',
-    desktopDownloads: 'Descargas de escritorio',
-    bestFor: 'Ideal para',
-    bestForValue: 'Flujos de trabajo en Windows',
-    corePromise: 'Promesa central',
-    corePromiseValue: 'Primero inactivo. Respuesta inmediata.',
-    status: 'Estado',
-    armed: 'Listo',
-    idleDelay: 'Espera inactiva',
-    pattern: 'Patron',
-    tray: 'Bandeja',
-    ready: 'Lista',
-    surfaceFootOne: 'La app de escritorio solo toma control despues de la inactividad.',
-    surfaceFootTwo: 'Tu mouse recupera el control al instante.',
-    featureEyebrow: 'Funcion',
-    features: [
-      {
-        title: 'Control basado en inactividad',
-        body: 'WIGGLER permanece preparado en segundo plano y solo empieza a moverse cuando de verdad has estado inactivo.',
-      },
-      {
-        title: 'Devolucion inmediata',
-        body: 'En cuanto tocas el mouse, la app de escritorio se detiene y te devuelve el control al instante.',
-      },
-      {
-        title: 'Movimiento acotado',
-        body: 'Los patrones siguen siendo visibles y permanecen en pantalla sin salirse del borde.',
-      },
-    ],
-    motionEyebrow: 'Biblioteca de movimiento',
-    motionTitle: 'Patrones visibles, comportamiento discreto.',
-    motionBody:
-      'La app de escritorio ofrece seis estilos de movimiento y se mantiene dentro de los limites de la pantalla. El sitio refleja ese lenguaje visual sin fingir que controla tu cursor real.',
-    demoEyebrow: 'Vista interactiva',
-    demoTitle: 'Elige la forma exacta y mira el recorrido.',
-    demoBody:
-      'Los navegadores no pueden mover tu mouse real, por eso esta pagina se centra en la experiencia, el lenguaje de movimiento y la marca.',
-    browserDemo: 'Demo web',
-    demoChooserTitle: 'Elige una ruta y mira como el cursor la recorre.',
-    settingsEyebrow: 'Vista de ajustes',
-    settingsTitle: 'Ajusta el sitio como deberia sentirse la app.',
-    settingsBody:
-      'Tema, idioma, paleta y controles de movimiento estan aqui para que el sitio se sienta mas como un producto real y menos como una pagina estatica.',
-    appearance: 'Apariencia',
+    navFaq: 'Preguntas',
+    settings: 'Ajustes',
     theme: 'Tema',
-    vibe: 'Paleta',
     language: 'Idioma',
-    comfort: 'Comodidad',
-    motionSpeed: 'Velocidad del demo',
-    motionSpeedLabel: 'Reproduccion',
-    reduceMotion: 'Reducir movimiento',
-    highContrast: 'Alto contraste',
-    on: 'Si',
-    off: 'No',
-    themeOptions: { auto: 'Auto', light: 'Claro', dark: 'Oscuro' },
-    vibeOptions: { porcelain: 'Porcelain', tide: 'Tide', ember: 'Ember', dusk: 'Dusk' },
-    languageOptions: { en: 'Ingles', es: 'Espanol', pt: 'Portugues' },
-    speedOptions: { slow: 'Lenta', normal: 'Normal', brisk: 'Rapida' },
-    ctaEyebrow: 'Entrega de escritorio',
-    ctaTitle: 'El siguiente paso es una publicacion real en GitHub para Windows.',
-    ctaBody:
-      'La forma mas limpia de distribuir la app es con GitHub Releases. Asi obtienes una pagina real de descarga sin inflar el historial del repositorio.',
-    openReleases: 'Abrir releases',
-    faqEyebrow: 'FAQ',
-    faqTitle: 'Preguntas comunes',
-    faqs: [
-      {
-        question: 'La web puede mover mi mouse real?',
-        answer:
-          'No. Los navegadores no pueden controlar el mouse del sistema. La web sirve para la marca, la historia del producto y una demo visual. La app de escritorio es la utilidad real.',
-      },
-      {
-        question: 'Que patrones soporta WIGGLER?',
-        answer:
-          'Circle, Square, Triangle, Figure 8, Parallelogram y Random estan soportados en la app de escritorio y tambien aparecen en la demo del sitio.',
-      },
-      {
-        question: 'Cual es la mejor forma de distribuir la app?',
-        answer:
-          'GitHub Releases es el lugar mas limpio para la version de Windows. Mantiene el ejecutable fuera del historial normal del repo y te da una pagina de descarga adecuada.',
-      },
-    ],
-    patternLabels: {
-      Circle: 'Una orbita continua y suave.',
-      Square: 'Lados rectos con giros definidos.',
-      Triangle: 'Recorrido de tres lados con picos visibles.',
-      'Figure 8': 'Un cruce en bucle con un tono mas jugueton.',
-      Parallelogram: 'Geometria inclinada con una postura mas limpia.',
-      Random: 'Puntos sueltos que aun se mantienen dentro del marco.',
-    },
+    light: 'Claro',
+    dark: 'Oscuro',
+    watchDemo: 'Ver demo',
+    desktopDownloads: 'Descargas',
   },
   pt: {
     navFeatures: 'Recursos',
-    navDemo: 'Demo',
-    navSettings: 'Ajustes',
-    navFaq: 'FAQ',
-    navGithub: 'GitHub',
-    heroEyebrow: 'Utilitario de desktop, agora com casa na web',
-    heroTitle: 'Mantem a sessao ativa sem brigar com a pessoa.',
-    heroBody:
-      'WIGGLER by SMBA e um app leve para Windows que espera o tempo ocioso e depois move o cursor em formas limpas e contidas ate voce tocar o mouse outra vez.',
-    watchDemo: 'Ver demo',
-    desktopDownloads: 'Downloads desktop',
-    bestFor: 'Melhor para',
-    bestForValue: 'Fluxos de trabalho no Windows',
-    corePromise: 'Promessa central',
-    corePromiseValue: 'Ocioso primeiro. Controle imediato.',
-    status: 'Status',
-    armed: 'Pronto',
-    idleDelay: 'Espera ociosa',
-    pattern: 'Padrao',
-    tray: 'Bandeja',
-    ready: 'Pronta',
-    surfaceFootOne: 'O app desktop so assume depois da inatividade.',
-    surfaceFootTwo: 'Seu mouse retoma o controle na hora.',
-    featureEyebrow: 'Recurso',
-    features: [
-      {
-        title: 'Controle por inatividade',
-        body: 'WIGGLER fica armado em segundo plano e so comeca a mover quando voce realmente fica ocioso.',
-      },
-      {
-        title: 'Retorno imediato',
-        body: 'Assim que voce toca o mouse, o app desktop para e devolve o controle imediatamente.',
-      },
-      {
-        title: 'Movimento contido',
-        body: 'Os padroes permanecem visiveis e dentro da tela em vez de escapar pelas bordas.',
-      },
-    ],
-    motionEyebrow: 'Biblioteca de movimento',
-    motionTitle: 'Padroes visiveis, comportamento discreto.',
-    motionBody:
-      'O app desktop suporta seis estilos de movimento e permanece dentro dos limites da tela. O site espelha essa linguagem visual sem fingir controlar seu cursor real.',
-    demoEyebrow: 'Previa interativa',
-    demoTitle: 'Escolha a forma exata e veja o movimento.',
-    demoBody:
-      'Navegadores nao podem mover seu mouse real, entao esta pagina foca na experiencia, na linguagem de movimento e na marca.',
-    browserDemo: 'Demo web',
-    demoChooserTitle: 'Escolha um trajeto e veja o cursor seguir o caminho.',
-    settingsEyebrow: 'Previa de ajustes',
-    settingsTitle: 'Ajuste o site como o app deveria parecer.',
-    settingsBody:
-      'Tema, idioma, paleta e controles de movimento ficam aqui para o site parecer mais um produto real e menos uma pagina estatica.',
-    appearance: 'Aparencia',
+    navFaq: 'Perguntas',
+    settings: 'Ajustes',
     theme: 'Tema',
-    vibe: 'Paleta',
     language: 'Idioma',
-    comfort: 'Conforto',
-    motionSpeed: 'Velocidade da demo',
-    motionSpeedLabel: 'Ritmo',
-    reduceMotion: 'Reduzir movimento',
-    highContrast: 'Alto contraste',
-    on: 'Ligado',
-    off: 'Desligado',
-    themeOptions: { auto: 'Auto', light: 'Claro', dark: 'Escuro' },
-    vibeOptions: { porcelain: 'Porcelain', tide: 'Tide', ember: 'Ember', dusk: 'Dusk' },
-    languageOptions: { en: 'Ingles', es: 'Espanhol', pt: 'Portugues' },
-    speedOptions: { slow: 'Lento', normal: 'Normal', brisk: 'Rapido' },
-    ctaEyebrow: 'Entrega desktop',
-    ctaTitle: 'O proximo passo e uma release de verdade no GitHub para Windows.',
-    ctaBody:
-      'A forma mais limpa de distribuir o app e com GitHub Releases. Isso cria uma pagina real de download sem inflar o historico do repositorio.',
-    openReleases: 'Abrir releases',
-    faqEyebrow: 'FAQ',
-    faqTitle: 'Perguntas comuns',
-    faqs: [
-      {
-        question: 'O site pode mover meu mouse real?',
-        answer:
-          'Nao. Navegadores nao podem controlar o mouse do sistema. O site existe para a marca, a historia do produto e uma demo visual. O app desktop e a utilidade real.',
-      },
-      {
-        question: 'Quais padroes o WIGGLER suporta?',
-        answer:
-          'Circle, Square, Triangle, Figure 8, Parallelogram e Random existem no app desktop e tambem aparecem na demo do site.',
-      },
-      {
-        question: 'Qual e a melhor forma de distribuir o app?',
-        answer:
-          'GitHub Releases e o lugar mais limpo para a versao de Windows. Mantem o executavel fora do historico normal do repo e oferece uma pagina de download adequada.',
-      },
-    ],
-    patternLabels: {
-      Circle: 'Uma orbita continua e suave.',
-      Square: 'Lados retos com curvas bem marcadas.',
-      Triangle: 'Tres lados com picos bem visiveis.',
-      'Figure 8': 'Um cruzamento em loop com clima mais brincalhao.',
-      Parallelogram: 'Geometria inclinada com uma postura mais limpa.',
-      Random: 'Pontos livres que ainda ficam dentro da moldura.',
-    },
+    light: 'Claro',
+    dark: 'Escuro',
+    watchDemo: 'Ver demo',
+    desktopDownloads: 'Downloads',
+  },
+  fr: {
+    navFeatures: 'Fonctions',
+    settings: 'Parametres',
+    theme: 'Theme',
+    language: 'Langue',
+    light: 'Clair',
+    dark: 'Sombre',
+    watchDemo: 'Voir la demo',
+    desktopDownloads: 'Telechargements',
+  },
+  de: {
+    navFeatures: 'Funktionen',
+    settings: 'Einstellungen',
+    theme: 'Design',
+    language: 'Sprache',
+    light: 'Hell',
+    dark: 'Dunkel',
+    watchDemo: 'Demo ansehen',
+    desktopDownloads: 'Downloads',
+  },
+  it: {
+    navFeatures: 'Funzioni',
+    settings: 'Impostazioni',
+    theme: 'Tema',
+    language: 'Lingua',
+    light: 'Chiaro',
+    dark: 'Scuro',
+    watchDemo: 'Guarda demo',
+    desktopDownloads: 'Download',
+  },
+  nl: {
+    navFeatures: 'Functies',
+    settings: 'Instellingen',
+    theme: 'Thema',
+    language: 'Taal',
+    light: 'Licht',
+    dark: 'Donker',
+  },
+  sv: {
+    navFeatures: 'Funktioner',
+    settings: 'Installningar',
+    theme: 'Tema',
+    language: 'Sprak',
+    light: 'Ljust',
+    dark: 'Morkt',
+  },
+  ja: {
+    navFeatures: 'Features',
+    settings: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  ko: {
+    navFeatures: 'Features',
+    settings: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  zh: {
+    navFeatures: 'Features',
+    settings: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  ar: {
+    navFeatures: 'Features',
+    settings: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+    light: 'Light',
+    dark: 'Dark',
+  },
+  hi: {
+    navFeatures: 'Features',
+    settings: 'Settings',
+    theme: 'Theme',
+    language: 'Language',
+    light: 'Light',
+    dark: 'Dark',
   },
 }
 
 const storageKeys = {
   theme: 'wiggler-theme',
-  vibe: 'wiggler-vibe',
   language: 'wiggler-language',
-  speed: 'wiggler-speed',
-  reduceMotion: 'wiggler-reduce-motion',
-  highContrast: 'wiggler-high-contrast',
 }
 
 function getInitialLanguage() {
   const stored = window.localStorage.getItem(storageKeys.language)
-  if (stored && copy[stored]) {
+  if (stored && languageOptions[stored]) {
     return stored
   }
 
   const browserLanguage = window.navigator.language.toLowerCase()
-  if (browserLanguage.startsWith('es')) {
-    return 'es'
-  }
-  if (browserLanguage.startsWith('pt')) {
-    return 'pt'
-  }
-
-  return 'en'
+  const match = Object.keys(languageOptions).find((code) => browserLanguage.startsWith(code))
+  return match ?? 'en'
 }
 
-function resolveTheme(theme) {
-  if (theme !== 'auto') {
-    return theme
+function getCopy(language) {
+  return {
+    ...baseCopy,
+    ...languageOverrides[language],
+    languageOptions,
   }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
 }
 
-function PatternDemo({ language, speed, reduceMotion }) {
+function PatternDemo({ language }) {
   const [selectedPattern, setSelectedPattern] = useState('Circle')
   const activePattern = patternConfig[selectedPattern]
-  const text = copy[language]
-  const speedMultiplier = speed === 'slow' ? 1.35 : speed === 'brisk' ? 0.82 : 1
-  const animationDuration = `${(reduceMotion ? activePattern.duration * 2.3 : activePattern.duration * speedMultiplier).toFixed(1)}s`
+  const text = getCopy(language)
 
   return (
     <div className="demo-card">
@@ -436,7 +332,7 @@ function PatternDemo({ language, speed, reduceMotion }) {
       </div>
 
       <svg
-        key={`${selectedPattern}-${animationDuration}`}
+        key={selectedPattern}
         className="demo-svg"
         viewBox="0 0 640 420"
         role="img"
@@ -450,11 +346,9 @@ function PatternDemo({ language, speed, reduceMotion }) {
         {activePattern.outline}
 
         <g className="cursor-group">
-          {!reduceMotion && (
-            <animateMotion dur={animationDuration} repeatCount="indefinite" rotate="auto">
-              <mpath href="#selected-path" />
-            </animateMotion>
-          )}
+          <animateMotion dur={`${activePattern.duration}s`} repeatCount="indefinite" rotate="auto">
+            <mpath href="#selected-path" />
+          </animateMotion>
           <path
             className="cursor-shape"
             d="M0 0 L40 16 L18 26 L28 46 L16 52 L6 30 L-2 48 L-10 44 L-2 18 Z"
@@ -467,148 +361,62 @@ function PatternDemo({ language, speed, reduceMotion }) {
   )
 }
 
-function SettingsSection({
-  language,
-  setLanguage,
-  theme,
-  setTheme,
-  vibe,
-  setVibe,
-  speed,
-  setSpeed,
-  reduceMotion,
-  setReduceMotion,
-  highContrast,
-  setHighContrast,
-}) {
-  const text = copy[language]
+function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIsOpen }) {
+  const text = getCopy(language)
 
   return (
-    <section className="settings-section" id="settings">
-      <div className="section-heading">
-        <p className="eyebrow">{text.settingsEyebrow}</p>
-        <h2>{text.settingsTitle}</h2>
-        <p>{text.settingsBody}</p>
-      </div>
+    <div className="settings-wrap">
+      <button
+        type="button"
+        className={`settings-trigger ${isOpen ? 'is-active' : ''}`}
+        aria-label={text.settings}
+        aria-expanded={isOpen}
+        onClick={() => setIsOpen((current) => !current)}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3.75 13.62 5.1l2.08-.31.93 1.89 1.99.69-.1 2.11 1.48 1.49-1.11 1.8 1.11 1.8-1.48 1.49.1 2.11-1.99.69-.93 1.89-2.08-.31L12 20.25l-1.62-1.35-2.08.31-.93-1.89-1.99-.69.1-2.11-1.48-1.49 1.11-1.8-1.11-1.8 1.48-1.49-.1-2.11 1.99-.69.93-1.89 2.08.31L12 3.75Z" />
+          <circle cx="12" cy="12" r="3.3" />
+        </svg>
+      </button>
 
-      <div className="settings-grid">
-        <article className="settings-card">
-          <p className="eyebrow">{text.appearance}</p>
-          <div className="setting-group">
+      {isOpen && (
+        <div className="settings-popover">
+          <div className="setting-group compact">
             <label htmlFor="theme-select">{text.theme}</label>
             <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
-              <option value="auto">{text.themeOptions.auto}</option>
-              <option value="light">{text.themeOptions.light}</option>
-              <option value="dark">{text.themeOptions.dark}</option>
+              <option value="light">{text.light}</option>
+              <option value="dark">{text.dark}</option>
             </select>
           </div>
-          <div className="setting-group">
-            <label htmlFor="vibe-select">{text.vibe}</label>
-            <select id="vibe-select" value={vibe} onChange={(event) => setVibe(event.target.value)}>
-              <option value="porcelain">{text.vibeOptions.porcelain}</option>
-              <option value="tide">{text.vibeOptions.tide}</option>
-              <option value="ember">{text.vibeOptions.ember}</option>
-              <option value="dusk">{text.vibeOptions.dusk}</option>
-            </select>
-          </div>
-          <div className="setting-group">
+
+          <div className="setting-group compact">
             <label htmlFor="language-select">{text.language}</label>
             <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
-              <option value="en">{text.languageOptions.en}</option>
-              <option value="es">{text.languageOptions.es}</option>
-              <option value="pt">{text.languageOptions.pt}</option>
+              {Object.entries(text.languageOptions).map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label}
+                </option>
+              ))}
             </select>
           </div>
-        </article>
-
-        <article className="settings-card">
-          <p className="eyebrow">{text.comfort}</p>
-          <div className="setting-group">
-            <label htmlFor="speed-select">{text.motionSpeed}</label>
-            <select id="speed-select" value={speed} onChange={(event) => setSpeed(event.target.value)}>
-              <option value="slow">{text.speedOptions.slow}</option>
-              <option value="normal">{text.speedOptions.normal}</option>
-              <option value="brisk">{text.speedOptions.brisk}</option>
-            </select>
-          </div>
-          <div className="toggle-row">
-            <div>
-              <strong>{text.reduceMotion}</strong>
-              <p>{reduceMotion ? text.on : text.off}</p>
-            </div>
-            <button
-              type="button"
-              className={`toggle-button ${reduceMotion ? 'is-active' : ''}`}
-              onClick={() => setReduceMotion((current) => !current)}
-              aria-pressed={reduceMotion}
-            >
-              <span />
-            </button>
-          </div>
-          <div className="toggle-row">
-            <div>
-              <strong>{text.highContrast}</strong>
-              <p>{highContrast ? text.on : text.off}</p>
-            </div>
-            <button
-              type="button"
-              className={`toggle-button ${highContrast ? 'is-active' : ''}`}
-              onClick={() => setHighContrast((current) => !current)}
-              aria-pressed={highContrast}
-            >
-              <span />
-            </button>
-          </div>
-        </article>
-      </div>
-    </section>
+        </div>
+      )}
+    </div>
   )
 }
 
 function App() {
-  const [theme, setTheme] = useState(() => window.localStorage.getItem(storageKeys.theme) ?? 'auto')
-  const [vibe, setVibe] = useState(() => window.localStorage.getItem(storageKeys.vibe) ?? 'porcelain')
+  const [theme, setTheme] = useState(() => window.localStorage.getItem(storageKeys.theme) ?? 'light')
   const [language, setLanguage] = useState(getInitialLanguage)
-  const [speed, setSpeed] = useState(() => window.localStorage.getItem(storageKeys.speed) ?? 'normal')
-  const [reduceMotion, setReduceMotion] = useState(
-    () => window.localStorage.getItem(storageKeys.reduceMotion) === 'true',
-  )
-  const [highContrast, setHighContrast] = useState(
-    () => window.localStorage.getItem(storageKeys.highContrast) === 'true',
-  )
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   useEffect(() => {
-    const root = document.documentElement
-    const applyTheme = () => {
-      root.dataset.theme = resolveTheme(theme)
-      root.dataset.vibe = vibe
-      root.dataset.contrast = highContrast ? 'high' : 'normal'
-      root.dataset.motion = reduceMotion ? 'reduced' : 'full'
-    }
-
-    applyTheme()
+    document.documentElement.dataset.theme = theme
     window.localStorage.setItem(storageKeys.theme, theme)
-    window.localStorage.setItem(storageKeys.vibe, vibe)
     window.localStorage.setItem(storageKeys.language, language)
-    window.localStorage.setItem(storageKeys.speed, speed)
-    window.localStorage.setItem(storageKeys.reduceMotion, String(reduceMotion))
-    window.localStorage.setItem(storageKeys.highContrast, String(highContrast))
+  }, [theme, language])
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-    const handleChange = () => {
-      if (theme === 'auto') {
-        applyTheme()
-      }
-    }
-
-    mediaQuery.addEventListener('change', handleChange)
-
-    return () => {
-      mediaQuery.removeEventListener('change', handleChange)
-    }
-  }, [theme, vibe, language, speed, reduceMotion, highContrast])
-
-  const text = copy[language]
+  const text = getCopy(language)
 
   return (
     <div className="site-shell">
@@ -630,15 +438,25 @@ function App() {
           </div>
         </div>
 
-        <nav className="topnav" aria-label="Primary">
-          <a href="#features">{text.navFeatures}</a>
-          <a href="#demo">{text.navDemo}</a>
-          <a href="#settings">{text.navSettings}</a>
-          <a href="#faq">{text.navFaq}</a>
-          <a className="button ghost" href="https://github.com/smba11/Wiggler" target="_blank" rel="noreferrer">
-            {text.navGithub}
-          </a>
-        </nav>
+        <div className="topbar-actions">
+          <nav className="topnav" aria-label="Primary">
+            <a href="#features">{text.navFeatures}</a>
+            <a href="#demo">{text.navDemo}</a>
+            <a href="#faq">{text.navFaq}</a>
+            <a className="button ghost" href="https://github.com/smba11/Wiggler" target="_blank" rel="noreferrer">
+              {text.navGithub}
+            </a>
+          </nav>
+
+          <SettingsPopover
+            language={language}
+            setLanguage={setLanguage}
+            theme={theme}
+            setTheme={setTheme}
+            isOpen={isSettingsOpen}
+            setIsOpen={setIsSettingsOpen}
+          />
+        </div>
       </header>
 
       <main>
@@ -732,23 +550,8 @@ function App() {
             <h2>{text.demoTitle}</h2>
             <p>{text.demoBody}</p>
           </div>
-          <PatternDemo language={language} speed={speed} reduceMotion={reduceMotion} />
+          <PatternDemo language={language} />
         </section>
-
-        <SettingsSection
-          language={language}
-          setLanguage={setLanguage}
-          theme={theme}
-          setTheme={setTheme}
-          vibe={vibe}
-          setVibe={setVibe}
-          speed={speed}
-          setSpeed={setSpeed}
-          reduceMotion={reduceMotion}
-          setReduceMotion={setReduceMotion}
-          highContrast={highContrast}
-          setHighContrast={setHighContrast}
-        />
 
         <section className="cta-section">
           <div className="cta-card">

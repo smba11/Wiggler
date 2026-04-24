@@ -70,9 +70,9 @@ internal static class NativeMethods
     [DllImport("user32.dll")]
     internal static extern nint CallNextHookEx(nint hhk, int nCode, nint wParam, nint lParam);
 
-    [DllImport("user32.dll", SetLastError = true)]
-    internal static extern uint SendInput(uint nInputs, [In] Input[] pInputs, int cbSize);
-
     [DllImport("user32.dll")]
     internal static extern bool GetCursorPos(out Point lpPoint);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    internal static extern bool SetCursorPos(int x, int y);
 }

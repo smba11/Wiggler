@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.Windows;
 using WigglerBySmba.Models;
 using Point = System.Windows.Point;
@@ -182,7 +181,7 @@ public sealed class MouseMovementService : IDisposable
         var maxPixelsThisFrame = Math.Max(2.4, (110 + (_speed * 155)) * dt);
         var applied = delta * Math.Min(distance, maxPixelsThisFrame);
         var nextPoint = ClampToScreen(cursor + applied);
-        MoveCursorAbsolute(nextPoint);
+        MoveCursor(nextPoint);
     }
 
     private Point CreateRandomTarget()
@@ -234,34 +233,10 @@ public sealed class MouseMovementService : IDisposable
         return new Point(cursor.X, cursor.Y);
     }
 
-    private static void MoveCursorAbsolute(Point target)
+    private static void MoveCursor(Point target)
     {
-        var bounds = GetVirtualBounds();
-        var normalizedX = NormalizeAbsoluteCoordinate(target.X, bounds.Left, bounds.Width);
-        var normalizedY = NormalizeAbsoluteCoordinate(target.Y, bounds.Top, bounds.Height);
-
-        var input = new NativeMethods.Input
-        {
-            Type = NativeMethods.InputMouse,
-            Data = new NativeMethods.InputUnion
-            {
-                Mi = new NativeMethods.MouseInput
-                {
-                    Dx = normalizedX,
-                    Dy = normalizedY,
-                    DwFlags = NativeMethods.MouseeventfMove | NativeMethods.MouseeventfAbsolute | NativeMethods.MouseeventfVirtualdesk,
-                    DwExtraInfo = NativeMethods.WigglerExtraInfo
-                }
-            }
-        };
-
-        NativeMethods.SendInput(1, [input], Marshal.SizeOf<NativeMethods.Input>());
-    }
-
-    private static int NormalizeAbsoluteCoordinate(double value, double min, double length)
-    {
-        var relative = length <= 1 ? 0 : (value - min) / (length - 1);
-        return (int)Math.Round(Math.Clamp(relative, 0, 1) * 65535.0);
+        InjectedMouseTracker.Record(target);
+        NativeMethods.SetCursorPos((int)Math.Round(target.X), (int)Math.Round(target.Y));
     }
 
     public void Dispose()

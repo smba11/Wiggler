@@ -26,7 +26,8 @@ public sealed class MouseHookService : IDisposable
         if (message is NativeMethods.WmMouseMove or NativeMethods.WmLButtonDown or NativeMethods.WmRButtonDown or NativeMethods.WmMouseWheel or NativeMethods.WmMButtonDown or NativeMethods.WmMouseHWheel)
         {
             var mouseInfo = Marshal.PtrToStructure<NativeMethods.MsllHookStruct>(lParam);
-            if (mouseInfo.DwExtraInfo != NativeMethods.WigglerExtraInfo)
+            if (mouseInfo.DwExtraInfo != NativeMethods.WigglerExtraInfo
+                && !InjectedMouseTracker.Matches(mouseInfo.Pt.X, mouseInfo.Pt.Y))
             {
                 UserMouseActivity?.Invoke(this, EventArgs.Empty);
             }

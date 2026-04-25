@@ -1410,25 +1410,21 @@ function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIs
         <div className="settings-popover">
           <div className="setting-group compact">
             <label htmlFor="theme-select">{text.theme}</label>
-            <div className="select-shell">
-              <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
-                <option value="light">{text.light}</option>
-                <option value="dark">{text.dark}</option>
-              </select>
-            </div>
+            <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
+              <option value="light">{text.light}</option>
+              <option value="dark">{text.dark}</option>
+            </select>
           </div>
 
           <div className="setting-group compact">
             <label htmlFor="language-select">{text.language}</label>
-            <div className="select-shell">
-              <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
-                {Object.entries(text.languageOptions).map(([code, label]) => (
-                  <option key={code} value={code}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
+              {Object.entries(text.languageOptions).map(([code, label]) => (
+                <option key={code} value={code}>
+                  {label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
       )}

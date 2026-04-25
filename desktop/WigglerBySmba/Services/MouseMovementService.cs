@@ -19,6 +19,7 @@ public sealed class MouseMovementService : IDisposable
     private double _cycleProgress;
     private Vector _centerVelocity;
     private Point _roamingCenter;
+    private Point _nextRoamingCenter;
     private Point _randomTarget;
     private bool _isRunning;
 
@@ -44,6 +45,7 @@ public sealed class MouseMovementService : IDisposable
         var startPoint = new Point(cursor.X, cursor.Y);
         _roamingCenter = DeriveCenterFromCursor(pattern, startPoint);
         _centerVelocity = CreateVelocity();
+        _nextRoamingCenter = CreateNextCenter(_roamingCenter);
         _randomTarget = CreateRandomTarget();
         _isRunning = true;
         _stopwatch.Restart();
@@ -77,13 +79,14 @@ public sealed class MouseMovementService : IDisposable
         while (_cycleProgress >= 1)
         {
             _cycleProgress -= 1;
-            AdvanceRoamingCenter();
+            _roamingCenter = _nextRoamingCenter;
+            _nextRoamingCenter = CreateNextCenter(_roamingCenter);
         }
 
         MoveCursor(PointAlongPattern(_pattern, _cycleProgress));
     }
 
-    private void AdvanceRoamingCenter()
+    private Point CreateNextCenter(Point currentCenter)
     {
         var bounds = GetVirtualBounds();
         var margin = _size + 80;
@@ -91,61 +94,64 @@ public sealed class MouseMovementService : IDisposable
         var top = bounds.Top + margin;
         var right = bounds.Right - margin;
         var bottom = bounds.Bottom - margin;
-        var travel = 14 + (_speed * 8);
+        var travel = 7 + (_speed * 4);
 
-        _roamingCenter = new Point(
-            _roamingCenter.X + (_centerVelocity.X * travel),
-            _roamingCenter.Y + (_centerVelocity.Y * travel));
+        var nextCenter = new Point(
+            currentCenter.X + (_centerVelocity.X * travel),
+            currentCenter.Y + (_centerVelocity.Y * travel));
 
-        if (_roamingCenter.X < left || _roamingCenter.X > right)
+        if (nextCenter.X < left || nextCenter.X > right)
         {
             _centerVelocity = new Vector(-_centerVelocity.X, _centerVelocity.Y);
-            _roamingCenter.X = Math.Clamp(_roamingCenter.X, left, right);
+            nextCenter.X = Math.Clamp(nextCenter.X, left, right);
         }
 
-        if (_roamingCenter.Y < top || _roamingCenter.Y > bottom)
+        if (nextCenter.Y < top || nextCenter.Y > bottom)
         {
             _centerVelocity = new Vector(_centerVelocity.X, -_centerVelocity.Y);
-            _roamingCenter.Y = Math.Clamp(_roamingCenter.Y, top, bottom);
+            nextCenter.Y = Math.Clamp(nextCenter.Y, top, bottom);
         }
+
+        return nextCenter;
     }
 
     private Point PointAlongPattern(MovementPattern pattern, double progress)
     {
         var amplitude = _size;
+        var center = GetDisplayCenter(progress);
         return pattern switch
         {
             MovementPattern.Circle => ClampToScreen(new Point(
-                _roamingCenter.X + (Math.Cos(progress * Math.PI * 2) * amplitude),
-                _roamingCenter.Y + (Math.Sin(progress * Math.PI * 2) * amplitude))),
+                center.X + (Math.Cos(progress * Math.PI * 2) * amplitude),
+                center.Y + (Math.Sin(progress * Math.PI * 2) * amplitude))),
             MovementPattern.Square => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(-amplitude, -amplitude),
                 new Point(amplitude, -amplitude),
                 new Point(amplitude, amplitude),
                 new Point(-amplitude, amplitude)
-            })),
+            }, center)),
             MovementPattern.Triangle => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(0, -amplitude),
                 new Point(amplitude, amplitude * 0.76),
                 new Point(-amplitude, amplitude * 0.76)
-            })),
+            }, center)),
             MovementPattern.Figure8 => ClampToScreen(new Point(
-                _roamingCenter.X + (Math.Sin(progress * Math.PI * 2) * amplitude),
-                _roamingCenter.Y + (Math.Sin(progress * Math.PI * 4) * amplitude * 0.58))),
+                center.X + (Math.Sin(progress * Math.PI * 2) * amplitude),
+                center.Y + (Math.Sin(progress * Math.PI * 4) * amplitude * 0.58))),
             MovementPattern.Parallelogram => ClampToScreen(TracePolygon(progress, new[]
             {
                 new Point(-amplitude * 0.72, -amplitude),
                 new Point(amplitude * 0.92, -amplitude),
                 new Point(amplitude * 0.72, amplitude),
                 new Point(-amplitude * 0.92, amplitude)
-            })),
-            _ => ClampToScreen(_roamingCenter)
+            }, center)),
+            _ => ClampToScreen(center)
         };
     }
 
-    private Point TracePolygon(double progress, Point[] points)
+    private Point TracePolygon(double progress, Point[] points, Point center)
     {
         var loops = points.Length;
         var normalized = (((progress % 1) + 1) % 1) * loops;
@@ -157,8 +163,8 @@ public sealed class MouseMovementService : IDisposable
         var end = points[nextIndex];
 
         return new Point(
-            _roamingCenter.X + Lerp(start.X, end.X, edgeProgress),
-            _roamingCenter.Y + Lerp(start.Y, end.Y, edgeProgress));
+            center.X + Lerp(start.X, end.X, edgeProgress),
+            center.Y + Lerp(start.Y, end.Y, edgeProgress));
     }
 
     private Point NextRandomPoint()
@@ -272,6 +278,21 @@ public sealed class MouseMovementService : IDisposable
 
     private static double Lerp(double start, double end, double progress) =>
         start + ((end - start) * progress);
+
+    private Point GetDisplayCenter(double progress)
+    {
+        const double transitionStart = 0.9;
+        if (progress <= transitionStart)
+        {
+            return _roamingCenter;
+        }
+
+        var blend = (progress - transitionStart) / (1 - transitionStart);
+        var easedBlend = blend * blend * (3 - (2 * blend));
+        return new Point(
+            Lerp(_roamingCenter.X, _nextRoamingCenter.X, easedBlend),
+            Lerp(_roamingCenter.Y, _nextRoamingCenter.Y, easedBlend));
+    }
 
     private static Point GetCursorPoint()
     {

@@ -143,7 +143,6 @@ select {
   background: var(--surface-soft);
   color: var(--ink);
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(18, 24, 33, 0.07);
 }
 
 .settings-trigger svg {
@@ -164,7 +163,7 @@ select {
   right: 0;
   width: 260px;
   padding: 16px;
-  border-radius: 26px;
+  border-radius: 18px;
   border: 1px solid var(--surface-line);
   background: var(--panel-strong);
   box-shadow: 0 24px 60px rgba(18, 24, 33, 0.16);
@@ -521,28 +520,15 @@ select {
   text-transform: uppercase;
 }
 
-.select-shell {
-  padding: 4px;
-  border-radius: 26px;
-  border: 1px solid var(--surface-line);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.25)),
-    var(--surface-soft);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    0 10px 24px rgba(18, 24, 33, 0.06);
-}
-
 select {
   min-height: 50px;
   width: 100%;
   padding: 0 44px 0 18px;
-  border-radius: 22px;
+  border-radius: 18px;
   font: inherit;
   appearance: none;
   outline: none;
-  border: 0;
-  box-shadow: none;
+  border: 1px solid var(--surface-line);
   background-image:
     linear-gradient(45deg, transparent 50%, var(--muted-strong) 50%),
     linear-gradient(135deg, var(--muted-strong) 50%, transparent 50%);
@@ -551,6 +537,7 @@ select {
     calc(100% - 17px) calc(50% - 2px);
   background-size: 6px 6px, 6px 6px;
   background-repeat: no-repeat;
+  box-shadow: none;
 }
 
 .cta-card {

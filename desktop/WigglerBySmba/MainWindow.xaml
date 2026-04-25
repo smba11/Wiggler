@@ -39,7 +39,7 @@
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
-            <Setter Property="Padding" Value="20,6" />
+            <Setter Property="Padding" Value="18,6" />
             <Setter Property="FontSize" Value="14" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -49,14 +49,14 @@
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="24">
+                                    CornerRadius="18">
                                 <Grid>
-                                    <ContentPresenter Margin="20,0,48,0"
+                                    <ContentPresenter Margin="18,0,44,0"
                                                       VerticalAlignment="Center"
                                                       Content="{TemplateBinding SelectionBoxItem}" />
                                     <Path Width="10"
                                           Height="6"
-                                          Margin="0,0,20,0"
+                                          Margin="0,0,18,0"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Center"
                                           Stroke="{DynamicResource SubtleTextBrush}"
@@ -76,8 +76,8 @@
                                         Background="{DynamicResource SurfaceBrush}"
                                         BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="26">
-                                    <ScrollViewer Margin="6"
+                                        CornerRadius="18">
+                                    <ScrollViewer Margin="4"
                                                   CanContentScroll="True"
                                                   VerticalScrollBarVisibility="Auto">
                                         <ItemsPresenter />
@@ -102,10 +102,10 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBoxItem">
                         <Border x:Name="ItemBorder"
-                                Margin="4"
+                                Margin="2"
                                 Background="Transparent"
-                                CornerRadius="18">
-                            <ContentPresenter Margin="10,0" VerticalAlignment="Center" />
+                                CornerRadius="12">
+                            <ContentPresenter Margin="12,0" VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsHighlighted" Value="True">

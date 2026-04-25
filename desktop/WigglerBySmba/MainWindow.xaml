@@ -36,11 +36,13 @@
         </Style>
         <Style TargetType="ComboBox">
             <Setter Property="Height" Value="52" />
+            <Setter Property="MaxDropDownHeight" Value="280" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
             <Setter Property="Padding" Value="18,6" />
             <Setter Property="FontSize" Value="14" />
+            <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
@@ -50,19 +52,24 @@
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1"
                                     CornerRadius="18">
-                                <Grid>
-                                    <ContentPresenter Margin="18,0,44,0"
+                                <Grid SnapsToDevicePixels="True">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="40" />
+                                    </Grid.ColumnDefinitions>
+                                    <ContentPresenter Margin="18,0,0,0"
                                                       VerticalAlignment="Center"
                                                       Content="{TemplateBinding SelectionBoxItem}" />
-                                    <ToggleButton Background="Transparent"
+                                    <ToggleButton Grid.ColumnSpan="2"
+                                                  Background="Transparent"
                                                   BorderThickness="0"
                                                   Focusable="False"
                                                   ClickMode="Press"
                                                   IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
-                                    <Path Width="10"
+                                    <Path Grid.Column="1"
+                                          Width="10"
                                           Height="6"
-                                          Margin="0,0,18,0"
-                                          HorizontalAlignment="Right"
+                                          HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Stroke="{DynamicResource SubtleTextBrush}"
                                           StrokeThickness="2"
@@ -77,15 +84,15 @@
                                    PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                    StaysOpen="False"
                                    IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   PopupAnimation="Fade">
+                                    PopupAnimation="Fade">
                                 <Border Margin="0,8,0,0"
                                         MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                         Background="{DynamicResource SurfaceBrush}"
                                         BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                         BorderThickness="1"
                                         CornerRadius="18">
-                                    <ScrollViewer Margin="4"
-                                                  CanContentScroll="True"
+                                    <ScrollViewer Margin="6"
+                                                  CanContentScroll="False"
                                                   VerticalScrollBarVisibility="Auto">
                                         <ItemsPresenter />
                                     </ScrollViewer>
@@ -206,57 +213,25 @@
                             BorderThickness="1"
                             CornerRadius="28"
                             Padding="28">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="250" />
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel>
-                                <TextBlock FontSize="15"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource AccentBrush}"
-                                           Text="{Binding HeroEyebrow}" />
-                                <TextBlock Margin="0,14,0,0"
-                                           FontSize="52"
-                                           LineHeight="56"
-                                           FontWeight="SemiBold"
-                                           TextWrapping="Wrap"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding HeroLabel}" />
-                                <TextBlock Margin="0,16,0,0"
-                                           FontSize="16"
-                                           LineHeight="24"
-                                           TextWrapping="Wrap"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding StatusDetail}" />
-                            </StackPanel>
-
-                            <Border Grid.Column="1"
-                                    Margin="24,0,0,0"
-                                    Padding="20"
-                                    Background="{DynamicResource HeroCardBrush}"
-                                    BorderBrush="{DynamicResource HeroOutlineBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="24">
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock FontSize="13"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding NowTunedForLabel}" />
-                                    <TextBlock Margin="0,8,0,0"
-                                               FontSize="28"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding LocalizedSelectedPattern}" />
-                                    <TextBlock Margin="0,10,0,0"
-                                               FontSize="14"
-                                               LineHeight="22"
-                                               TextWrapping="Wrap"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding HeroCardDetail}" />
-                                </StackPanel>
-                            </Border>
-                        </Grid>
+                        <StackPanel>
+                            <TextBlock FontSize="15"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AccentBrush}"
+                                       Text="{Binding HeroEyebrow}" />
+                            <TextBlock Margin="0,14,0,0"
+                                       FontSize="50"
+                                       LineHeight="54"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Text="{Binding HeroLabel}" />
+                            <TextBlock Margin="0,14,0,0"
+                                       FontSize="16"
+                                       LineHeight="24"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="{Binding StatusDetail}" />
+                        </StackPanel>
                     </Border>
 
                     <Grid Grid.Row="1" Margin="0,22,0,0">
@@ -324,72 +299,56 @@
                         </Border>
                     </UniformGrid>
 
-                    <Grid Grid.Row="3" Margin="0,24,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1.2*" />
-                            <ColumnDefinition Width="16" />
-                            <ColumnDefinition Width="1*" />
-                        </Grid.ColumnDefinitions>
+                    <Border Grid.Row="3"
+                            Margin="0,24,0,0"
+                            Background="{DynamicResource SurfaceBrush}"
+                            BorderBrush="{DynamicResource HeroOutlineBrush}"
+                            BorderThickness="1"
+                            CornerRadius="26"
+                            Padding="22">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-                        <Border Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource HeroOutlineBrush}"
-                                BorderThickness="1"
-                                CornerRadius="26"
-                                Padding="22">
-                            <StackPanel>
-                                <TextBlock FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding HowItFeelsTitle}" />
-                                <TextBlock Margin="0,14,0,0"
-                                           FontSize="14"
-                                           LineHeight="22"
-                                           TextWrapping="Wrap"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding HowItFeelsBody}" />
-                                <WrapPanel Margin="0,18,0,0">
-                                    <Button Width="156"
-                                            Height="46"
-                                            Margin="0,0,12,12"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Command="{Binding ToggleSettingsCommand}">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock Margin="0,0,8,0"
-                                                       FontSize="15"
-                                                       Text="⚙" />
-                                            <TextBlock Text="{Binding SettingsButtonLabel}" />
-                                        </StackPanel>
-                                    </Button>
-                                    <Button Width="156"
-                                            Height="46"
-                                            Margin="0,0,12,12"
-                                            Style="{StaticResource SecondaryButtonStyle}"
-                                            Command="{Binding ReplayTutorialCommand}"
-                                            Content="{Binding ReplayTutorialLabel}" />
-                                </WrapPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <Border Grid.Column="2"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource HeroOutlineBrush}"
-                                BorderThickness="1"
-                                CornerRadius="26"
-                                Padding="22">
                             <StackPanel>
                                 <TextBlock FontSize="16"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextBrush}"
                                            Text="{Binding TrayReadyTitle}" />
-                                <TextBlock Margin="0,14,0,0"
+                                <TextBlock Margin="0,12,0,0"
                                            FontSize="14"
                                            LineHeight="22"
                                            TextWrapping="Wrap"
                                            Foreground="{DynamicResource SubtleTextBrush}"
                                            Text="{Binding TrayReadyBody}" />
                             </StackPanel>
-                        </Border>
-                    </Grid>
+
+                            <WrapPanel Grid.Column="1"
+                                       Margin="20,0,0,0"
+                                       VerticalAlignment="Center">
+                                <Button Width="156"
+                                        Height="46"
+                                        Margin="0,0,12,12"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Command="{Binding ToggleSettingsCommand}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Margin="0,0,8,0"
+                                                   FontSize="15"
+                                                   Text="⚙" />
+                                        <TextBlock Text="{Binding SettingsButtonLabel}" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Width="156"
+                                        Height="46"
+                                        Margin="0,0,0,12"
+                                        Style="{StaticResource SecondaryButtonStyle}"
+                                        Command="{Binding ReplayTutorialCommand}"
+                                        Content="{Binding ReplayTutorialLabel}" />
+                            </WrapPanel>
+                        </Grid>
+                    </Border>
                 </Grid>
             </Border>
 

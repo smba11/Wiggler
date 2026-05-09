@@ -78,6 +78,8 @@ public partial class TutorialWindow : Window, INotifyPropertyChanged
     }
 
     public string ProgressText => $"{_pageIndex + 1} / {_pages.Count}";
+    public double ProgressRatio => _pages.Count <= 1 ? 1 : (double)(_pageIndex + 1) / _pages.Count;
+    public bool IsBackEnabled => _pageIndex > 0;
 
     public string BackButtonText => _languageCode switch
     {
@@ -138,6 +140,8 @@ public partial class TutorialWindow : Window, INotifyPropertyChanged
         DetailText = page.Detail;
         OnPropertyChanged(nameof(WindowTitle));
         OnPropertyChanged(nameof(ProgressText));
+        OnPropertyChanged(nameof(ProgressRatio));
+        OnPropertyChanged(nameof(IsBackEnabled));
         OnPropertyChanged(nameof(BackButtonText));
         OnPropertyChanged(nameof(NextButtonText));
     }

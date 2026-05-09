@@ -3,18 +3,18 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF4F1EA" />
-        <SolidColorBrush x:Key="PanelBrush" Color="#FFF9F6EF" />
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="#FFF3F1EC" />
+        <SolidColorBrush x:Key="PanelBrush" Color="#FFF9F7F3" />
         <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
-        <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#FFE8F3F1" />
-        <SolidColorBrush x:Key="AccentBrush" Color="#FF0F766E" />
-        <SolidColorBrush x:Key="AccentMutedBrush" Color="#1A0F766E" />
-        <SolidColorBrush x:Key="TextBrush" Color="#FF1F2937" />
-        <SolidColorBrush x:Key="SubtleTextBrush" Color="#FF6B7280" />
-        <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="#FFF7F4EE" />
-        <SolidColorBrush x:Key="SettingsPanelBrush" Color="#FFFCFAF5" />
-        <SolidColorBrush x:Key="ThemeChipBrush" Color="#FFE5F3F0" />
-        <SolidColorBrush x:Key="ThemeChipBorderBrush" Color="#FFB9DDD7" />
+        <SolidColorBrush x:Key="SurfaceMutedBrush" Color="#FFF2F6F4" />
+        <SolidColorBrush x:Key="AccentBrush" Color="#FF156F67" />
+        <SolidColorBrush x:Key="AccentMutedBrush" Color="#1A156F67" />
+        <SolidColorBrush x:Key="TextBrush" Color="#FF18212B" />
+        <SolidColorBrush x:Key="SubtleTextBrush" Color="#FF677381" />
+        <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="#FFF7F5F0" />
+        <SolidColorBrush x:Key="SettingsPanelBrush" Color="#FFFEFCF8" />
+        <SolidColorBrush x:Key="ThemeChipBrush" Color="#FFE9F2EF" />
+        <SolidColorBrush x:Key="ThemeChipBorderBrush" Color="#FFD7E0DC" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Application.Resources>
 </Application>

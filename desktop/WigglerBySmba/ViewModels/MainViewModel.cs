@@ -121,6 +121,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(StatusDetail));
             OnPropertyChanged(nameof(ToggleButtonLabel));
             OnPropertyChanged(nameof(ToggleButtonBrush));
+            OnPropertyChanged(nameof(StatusChipBrush));
+            OnPropertyChanged(nameof(StatusChipTextBrush));
             StatusChanged?.Invoke(this, value);
         }
     }
@@ -183,6 +185,22 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         ? new SolidColorBrush(Color.FromRgb(153, 27, 27))
         : new SolidColorBrush(Color.FromRgb(15, 118, 110));
 
+    public Brush StatusChipBrush => Status switch
+    {
+        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(238, 242, 247)),
+        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(232, 244, 241)),
+        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(255, 241, 234)),
+        _ => new SolidColorBrush(Color.FromRgb(238, 242, 247))
+    };
+
+    public Brush StatusChipTextBrush => Status switch
+    {
+        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(71, 85, 105)),
+        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(15, 118, 110)),
+        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(180, 83, 9)),
+        _ => new SolidColorBrush(Color.FromRgb(71, 85, 105))
+    };
+
     public string SettingsButtonLabel => IsSettingsOpen ? Text.HideSettingsLabel : Text.OpenSettingsLabel;
     public string LocalizedSelectedPattern => LocalizePattern(SelectedPattern);
     public string SpeedDisplay => $"{Speed:0.0}x";
@@ -210,6 +228,22 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public string LookSectionTitle => Text.LookSectionTitle;
     public string BehaviorSectionTitle => Text.BehaviorSectionTitle;
     public string MovementSectionTitle => Text.MovementSectionTitle;
+    public string HelpSectionTitle => SelectedLanguageCode switch
+    {
+        "es" => "Ayuda",
+        "pt" => "Ajuda",
+        "fr" => "Aide",
+        "de" => "Hilfe",
+        "it" => "Aiuto",
+        "nl" => "Help",
+        "sv" => "Hjalp",
+        "ja" => "ヘルプ",
+        "ko" => "도움말",
+        "zh" => "帮助",
+        "ar" => "مساعدة",
+        "hi" => "मदद",
+        _ => "Help"
+    };
     public string ThemeLabel => Text.ThemeLabel;
     public string LanguageLabel => Text.LanguageLabel;
     public string ModeLabel => Text.ModeLabel;
@@ -638,9 +672,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             nameof(IdleDelayCardTitle), nameof(PatternCardTitle), nameof(TakeoverTitle), nameof(TakeoverValue), nameof(HowItFeelsTitle),
             nameof(HowItFeelsBody), nameof(ReplayTutorialLabel), nameof(TrayReadyTitle), nameof(TrayReadyBody), nameof(SettingsHeaderTitle),
             nameof(SettingsSubtitle), nameof(LookSectionTitle), nameof(BehaviorSectionTitle), nameof(MovementSectionTitle),
+            nameof(HelpSectionTitle),
             nameof(ThemeLabel), nameof(LanguageLabel), nameof(ModeLabel), nameof(ColorVibeLabel), nameof(LaunchInLabel),
             nameof(CloseBehaviorLabel), nameof(IdleDelayLabel), nameof(PatternLabel), nameof(SpeedLabel), nameof(SizeLabel),
-            nameof(ReadyCardValue), nameof(ThemeModeItems), nameof(ThemeVibeItems), nameof(LaunchModeItems),
+            nameof(ReadyCardValue), nameof(StatusChipBrush), nameof(StatusChipTextBrush), nameof(ThemeModeItems), nameof(ThemeVibeItems), nameof(LaunchModeItems),
             nameof(CloseBehaviorItems), nameof(PatternItems), nameof(LanguageItems)
         })
         {

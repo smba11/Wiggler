@@ -9,7 +9,7 @@ public sealed class AppSettings
     public MovementPattern Pattern { get; set; } = MovementPattern.Circle;
     public double Speed { get; set; } = 1.2;
     public double Size { get; set; } = 90;
-    public ThemeMode ThemeMode { get; set; } = ThemeMode.Light;
+    public ThemeMode ThemeMode { get; set; } = ThemeMode.Dark;
     public ThemeVibe ThemeVibe { get; set; } = ThemeVibe.Tide;
     public bool HasCompletedOnboarding { get; set; }
 }

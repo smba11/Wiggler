@@ -86,7 +86,6 @@
 }
 
 .button,
-select,
 .demo-pill,
 .settings-trigger {
   transition:
@@ -121,8 +120,7 @@ select,
 }
 
 .button.ghost,
-.demo-pill,
-select {
+.demo-pill {
   background: var(--surface-soft);
   border: 1px solid var(--surface-line);
   color: var(--ink);
@@ -161,9 +159,9 @@ select {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: 260px;
+  width: 290px;
   padding: 16px;
-  border-radius: 18px;
+  border-radius: 28px;
   border: 1px solid var(--surface-line);
   background: var(--panel-strong);
   box-shadow: 0 24px 60px rgba(18, 24, 33, 0.16);
@@ -371,9 +369,9 @@ select {
   letter-spacing: -0.04em;
 }
 
-.patterns-section {
+.patterns-summary {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 20px;
   align-items: center;
 }
@@ -520,24 +518,84 @@ select {
   text-transform: uppercase;
 }
 
-select {
-  min-height: 50px;
+.rounded-select {
+  position: relative;
+}
+
+.rounded-select-trigger {
   width: 100%;
-  padding: 0 44px 0 18px;
-  border-radius: 18px;
-  font: inherit;
-  appearance: none;
-  outline: none;
+  min-height: 52px;
+  padding: 0 18px;
+  border-radius: 999px;
   border: 1px solid var(--surface-line);
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--muted-strong) 50%),
-    linear-gradient(135deg, var(--muted-strong) 50%, transparent 50%);
-  background-position:
-    calc(100% - 23px) calc(50% - 2px),
-    calc(100% - 17px) calc(50% - 2px);
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-  box-shadow: none;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.rounded-select-value {
+  font-weight: 500;
+}
+
+.rounded-select-caret {
+  width: 10px;
+  height: 10px;
+  border-right: 1.7px solid var(--muted-strong);
+  border-bottom: 1.7px solid var(--muted-strong);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform 180ms ease;
+}
+
+.rounded-select.is-open .rounded-select-caret {
+  transform: rotate(-135deg) translateY(-1px);
+}
+
+.rounded-select-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: 100%;
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid var(--surface-line);
+  background: color-mix(in srgb, var(--panel-strong) 88%, white 12%);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 24px 44px rgba(18, 24, 33, 0.14);
+}
+
+.rounded-select-option {
+  width: 100%;
+  padding: 12px 14px;
+  border: 0;
+  border-radius: 18px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  cursor: pointer;
+}
+
+.rounded-select-option small {
+  font-size: 0.77rem;
+  color: var(--muted);
+}
+
+.rounded-select-option:hover,
+.rounded-select-option.is-selected {
+  background: var(--surface-soft);
+}
+
+.rounded-select-option.is-selected {
+  box-shadow: inset 0 0 0 1px var(--surface-line);
 }
 
 .cta-card {
@@ -556,7 +614,7 @@ select {
 @media (max-width: 1080px) {
   .topbar,
   .hero,
-  .patterns-section,
+  .patterns-summary,
   .cta-card,
   .demo-toolbar {
     grid-template-columns: 1fr;
@@ -634,7 +692,7 @@ select {
   }
 
   .settings-popover {
-    width: min(260px, calc(100vw - 32px));
+    width: min(290px, calc(100vw - 32px));
     right: 0;
   }
 }

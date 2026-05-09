@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
@@ -1324,6 +1324,89 @@ function getCopy(language) {
   }
 }
 
+function useOutsideClose(isOpen, onClose) {
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!isOpen) {
+      return
+    }
+
+    function handlePointerDown(event) {
+      if (ref.current && !ref.current.contains(event.target)) {
+        onClose()
+      }
+    }
+
+    function handleEscape(event) {
+      if (event.key === 'Escape') {
+        onClose()
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isOpen, onClose])
+
+  return ref
+}
+
+function RoundedSelect({ label, value, options, onChange, ariaLabel }) {
+  const [isOpen, setIsOpen] = useState(false)
+  const wrapperRef = useOutsideClose(isOpen, () => setIsOpen(false))
+  const selectedOption = options.find((option) => option.value === value) ?? options[0]
+
+  function handleKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault()
+      setIsOpen((current) => !current)
+    }
+  }
+
+  return (
+    <div className="setting-group compact">
+      <label>{label}</label>
+      <div ref={wrapperRef} className={`rounded-select ${isOpen ? 'is-open' : ''}`}>
+        <button
+          type="button"
+          className="rounded-select-trigger"
+          aria-label={ariaLabel}
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((current) => !current)}
+          onKeyDown={handleKeyDown}
+        >
+          <span className="rounded-select-value">{selectedOption.label}</span>
+          <span className="rounded-select-caret" aria-hidden="true" />
+        </button>
+
+        {isOpen && (
+          <div className="rounded-select-menu" role="listbox" aria-label={ariaLabel}>
+            {options.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                className={`rounded-select-option ${option.value === value ? 'is-selected' : ''}`}
+                onClick={() => {
+                  onChange(option.value)
+                  setIsOpen(false)
+                }}
+              >
+                <span>{option.label}</span>
+                {option.description ? <small>{option.description}</small> : null}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 function PatternDemo({ language }) {
   const [selectedPattern, setSelectedPattern] = useState('Circle')
   const activePattern = patternConfig[selectedPattern]
@@ -1391,6 +1474,21 @@ function PatternDemo({ language }) {
 
 function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIsOpen }) {
   const text = getCopy(language)
+  const themeOptions = useMemo(
+    () => [
+      { value: 'light', label: text.light, description: 'Bright, airy canvas' },
+      { value: 'dark', label: text.dark, description: 'Low-glow utility mode' },
+    ],
+    [text.dark, text.light],
+  )
+  const languageMenuOptions = useMemo(
+    () =>
+      Object.entries(text.languageOptions).map(([code, label]) => ({
+        value: code,
+        label,
+      })),
+    [text.languageOptions],
+  )
 
   return (
     <div className="settings-wrap">
@@ -1408,24 +1506,21 @@ function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIs
 
       {isOpen && (
         <div className="settings-popover">
-          <div className="setting-group compact">
-            <label htmlFor="theme-select">{text.theme}</label>
-            <select id="theme-select" value={theme} onChange={(event) => setTheme(event.target.value)}>
-              <option value="light">{text.light}</option>
-              <option value="dark">{text.dark}</option>
-            </select>
-          </div>
+          <RoundedSelect
+            label={text.theme}
+            value={theme}
+            options={themeOptions}
+            ariaLabel={text.theme}
+            onChange={setTheme}
+          />
 
-          <div className="setting-group compact">
-            <label htmlFor="language-select">{text.language}</label>
-            <select id="language-select" value={language} onChange={(event) => setLanguage(event.target.value)}>
-              {Object.entries(text.languageOptions).map(([code, label]) => (
-                <option key={code} value={code}>
-                  {label}
-                </option>
-              ))}
-            </select>
-          </div>
+          <RoundedSelect
+            label={text.language}
+            value={language}
+            options={languageMenuOptions}
+            ariaLabel={text.language}
+            onChange={setLanguage}
+          />
         </div>
       )}
     </div>
@@ -1558,16 +1653,18 @@ function App() {
         </section>
 
         <section className="patterns-section">
-          <div className="patterns-copy">
-            <p className="eyebrow">{text.motionEyebrow}</p>
-            <h2>{text.motionTitle}</h2>
-            <p>{text.motionBody}</p>
-          </div>
+          <div className="patterns-summary">
+            <div className="patterns-copy">
+              <p className="eyebrow">{text.motionEyebrow}</p>
+              <h2>{text.motionTitle}</h2>
+              <p>{text.motionBody}</p>
+            </div>
 
-          <div className="pattern-pills" aria-label="Supported patterns">
-            {patterns.map((pattern) => (
-              <span key={pattern}>{text.patternNames[pattern]}</span>
-            ))}
+            <div className="pattern-pills" aria-label="Supported patterns">
+              {patterns.map((pattern) => (
+                <span key={pattern}>{text.patternNames[pattern]}</span>
+              ))}
+            </div>
           </div>
         </section>
 

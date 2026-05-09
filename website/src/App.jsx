@@ -1527,6 +1527,41 @@ function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIs
   )
 }
 
+function QuestionsBubble({ language }) {
+  const text = getCopy(language)
+  const [openIndex, setOpenIndex] = useState(0)
+
+  return (
+    <section className="questions-bubble" aria-label={text.faqTitle}>
+      <div className="questions-head">
+        <span>{text.faqEyebrow}</span>
+        <h2>{text.faqTitle}</h2>
+      </div>
+
+      <div className="questions-list">
+        {text.faqs.map((item, index) => {
+          const isOpen = index === openIndex
+
+          return (
+            <article key={item.question} className={`question-item ${isOpen ? 'is-open' : ''}`}>
+              <button
+                type="button"
+                className="question-trigger"
+                aria-expanded={isOpen}
+                onClick={() => setOpenIndex(isOpen ? -1 : index)}
+              >
+                <span>{item.question}</span>
+                <span className="question-caret" aria-hidden="true" />
+              </button>
+              {isOpen ? <p>{item.answer}</p> : null}
+            </article>
+          )
+        })}
+      </div>
+    </section>
+  )
+}
+
 function App() {
   const [theme, setTheme] = useState(() => window.localStorage.getItem(storageKeys.theme) ?? 'light')
   const [language, setLanguage] = useState(getInitialLanguage)
@@ -1628,20 +1663,7 @@ function App() {
           </div>
         </section>
 
-        <section className="quick-strip" aria-label="Key details">
-          <article>
-            <span>{text.bestFor}</span>
-            <strong>{text.bestForValue}</strong>
-          </article>
-          <article>
-            <span>{text.corePromise}</span>
-            <strong>{text.corePromiseValue}</strong>
-          </article>
-          <article>
-            <span>{text.pattern}</span>
-            <strong>{patterns.length} {text.navDemo}</strong>
-          </article>
-        </section>
+        <QuestionsBubble language={language} />
 
         <section className="demo-section" id="demo">
           <div className="section-heading">

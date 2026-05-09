@@ -123,6 +123,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(ToggleButtonBrush));
             OnPropertyChanged(nameof(StatusChipBrush));
             OnPropertyChanged(nameof(StatusChipTextBrush));
+            OnPropertyChanged(nameof(StatusDotBrush));
             StatusChanged?.Invoke(this, value);
         }
     }
@@ -201,6 +202,14 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _ => new SolidColorBrush(Color.FromRgb(71, 85, 105))
     };
 
+    public Brush StatusDotBrush => Status switch
+    {
+        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(148, 163, 184)),
+        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(20, 184, 166)),
+        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(245, 158, 11)),
+        _ => new SolidColorBrush(Color.FromRgb(148, 163, 184))
+    };
+
     public string SettingsButtonLabel => IsSettingsOpen ? Text.HideSettingsLabel : Text.OpenSettingsLabel;
     public string LocalizedSelectedPattern => LocalizePattern(SelectedPattern);
     public string SpeedDisplay => $"{Speed:0.0}x";
@@ -228,6 +237,22 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public string LookSectionTitle => Text.LookSectionTitle;
     public string BehaviorSectionTitle => Text.BehaviorSectionTitle;
     public string MovementSectionTitle => Text.MovementSectionTitle;
+    public string AppearanceSectionTitle => SelectedLanguageCode switch
+    {
+        "es" => "Apariencia",
+        "pt" => "Aparencia",
+        "fr" => "Apparence",
+        "de" => "Darstellung",
+        "it" => "Aspetto",
+        "nl" => "Uiterlijk",
+        "sv" => "Utseende",
+        "ja" => "外観",
+        "ko" => "모양",
+        "zh" => "外观",
+        "ar" => "المظهر",
+        "hi" => "दिखावट",
+        _ => "Appearance"
+    };
     public string HelpSectionTitle => SelectedLanguageCode switch
     {
         "es" => "Ayuda",
@@ -672,7 +697,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             nameof(IdleDelayCardTitle), nameof(PatternCardTitle), nameof(TakeoverTitle), nameof(TakeoverValue), nameof(HowItFeelsTitle),
             nameof(HowItFeelsBody), nameof(ReplayTutorialLabel), nameof(TrayReadyTitle), nameof(TrayReadyBody), nameof(SettingsHeaderTitle),
             nameof(SettingsSubtitle), nameof(LookSectionTitle), nameof(BehaviorSectionTitle), nameof(MovementSectionTitle),
-            nameof(HelpSectionTitle),
+            nameof(AppearanceSectionTitle), nameof(HelpSectionTitle),
             nameof(ThemeLabel), nameof(LanguageLabel), nameof(ModeLabel), nameof(ColorVibeLabel), nameof(LaunchInLabel),
             nameof(CloseBehaviorLabel), nameof(IdleDelayLabel), nameof(PatternLabel), nameof(SpeedLabel), nameof(SizeLabel),
             nameof(ReadyCardValue), nameof(StatusChipBrush), nameof(StatusChipTextBrush), nameof(ThemeModeItems), nameof(ThemeVibeItems), nameof(LaunchModeItems),

@@ -1546,16 +1546,14 @@ function App() {
         <div className="brand-lockup" aria-label="WIGGLER by SMBA">
           <div className="brand-stack">
             <div className="brand-mark" aria-hidden="true">
-              <svg viewBox="0 0 220 108">
-                <path d="M 18 52 C 38 74, 60 28, 88 52 S 140 74, 170 52" />
-                <path d="M 162 18 Q 174 2 194 4" />
-                <path d="M 168 30 Q 184 12 204 18" />
-                <path d="M 170 20 L 214 40 L 188 56 L 208 78 L 196 90 L 176 66 L 162 92 L 146 84 L 160 48 Z" />
+              <svg viewBox="0 0 32 32">
+                <rect x="0" y="0" width="32" height="32" rx="10" />
+                <path d="M 11 7 L 22 7 L 16.7 14.3 L 24 14.3 L 13.4 25 L 16.8 17.9 L 9 17.9 L 14.2 10.9 Z" />
               </svg>
             </div>
             <div className="wordmark-wrap">
               <p className="wordmark">WIGGLER</p>
-              <p className="submark">by smba</p>
+              <p className="submark">by</p>
             </div>
           </div>
         </div>

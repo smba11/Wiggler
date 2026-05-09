@@ -1562,9 +1562,7 @@ function App() {
 
         <div className="topbar-actions">
           <nav className="topnav" aria-label="Primary">
-            <a href="#features">{text.navFeatures}</a>
             <a href="#demo">{text.navDemo}</a>
-            <a href="#faq">{text.navFaq}</a>
             <a className="button ghost" href="https://github.com/smba11/Wiggler" target="_blank" rel="noreferrer">
               {text.navGithub}
             </a>
@@ -1584,7 +1582,6 @@ function App() {
       <main>
         <section className="hero">
           <div className="hero-copy">
-            <p className="eyebrow">{text.heroEyebrow}</p>
             <h1>{text.heroTitle}</h1>
             <p className="hero-body">{text.heroBody}</p>
 
@@ -1600,17 +1597,6 @@ function App() {
               >
                 {text.desktopDownloads}
               </a>
-            </div>
-
-            <div className="hero-meta">
-              <div>
-                <span className="meta-label">{text.bestFor}</span>
-                <strong>{text.bestForValue}</strong>
-              </div>
-              <div>
-                <span className="meta-label">{text.corePromise}</span>
-                <strong>{text.corePromiseValue}</strong>
-              </div>
             </div>
           </div>
 
@@ -1642,72 +1628,26 @@ function App() {
           </div>
         </section>
 
-        <section className="feature-strip" id="features">
-          {text.features.map((feature) => (
-            <article className="feature-card" key={feature.title}>
-              <p className="eyebrow">{text.featureEyebrow}</p>
-              <h2>{feature.title}</h2>
-              <p>{feature.body}</p>
-            </article>
-          ))}
-        </section>
-
-        <section className="patterns-section">
-          <div className="patterns-summary">
-            <div className="patterns-copy">
-              <p className="eyebrow">{text.motionEyebrow}</p>
-              <h2>{text.motionTitle}</h2>
-              <p>{text.motionBody}</p>
-            </div>
-
-            <div className="pattern-pills" aria-label="Supported patterns">
-              {patterns.map((pattern) => (
-                <span key={pattern}>{text.patternNames[pattern]}</span>
-              ))}
-            </div>
-          </div>
+        <section className="quick-strip" aria-label="Key details">
+          <article>
+            <span>{text.bestFor}</span>
+            <strong>{text.bestForValue}</strong>
+          </article>
+          <article>
+            <span>{text.corePromise}</span>
+            <strong>{text.corePromiseValue}</strong>
+          </article>
+          <article>
+            <span>{text.pattern}</span>
+            <strong>{patterns.length} {text.navDemo}</strong>
+          </article>
         </section>
 
         <section className="demo-section" id="demo">
           <div className="section-heading">
-            <p className="eyebrow">{text.demoEyebrow}</p>
             <h2>{text.demoTitle}</h2>
-            <p>{text.demoBody}</p>
           </div>
           <PatternDemo language={language} />
-        </section>
-
-        <section className="cta-section">
-          <div className="cta-card">
-            <div>
-              <p className="eyebrow">{text.ctaEyebrow}</p>
-              <h2>{text.ctaTitle}</h2>
-              <p>{text.ctaBody}</p>
-            </div>
-            <a
-              className="button primary"
-              href="https://github.com/smba11/Wiggler/releases"
-              target="_blank"
-              rel="noreferrer"
-            >
-              {text.openReleases}
-            </a>
-          </div>
-        </section>
-
-        <section className="faq-section" id="faq">
-          <div className="section-heading">
-            <p className="eyebrow">{text.faqEyebrow}</p>
-            <h2>{text.faqTitle}</h2>
-          </div>
-          <div className="faq-list">
-            {text.faqs.map((item) => (
-              <article className="faq-item" key={item.question}>
-                <h3>{item.question}</h3>
-                <p>{item.answer}</p>
-              </article>
-            ))}
-          </div>
         </section>
       </main>
     </div>

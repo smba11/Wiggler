@@ -9,10 +9,10 @@ namespace WigglerBySmba;
 
 public partial class MainWindow : Window
 {
-    private const double CompactWidth = 1040;
-    private const double ExpandedWidth = 1460;
-    private const double CompactMinWidth = 900;
-    private const double ExpandedMinWidth = 1260;
+    private const double CompactWidth = 920;
+    private const double ExpandedWidth = 1320;
+    private const double CompactMinWidth = 860;
+    private const double ExpandedMinWidth = 1120;
     private readonly SettingsService _settingsService;
     private readonly MouseHookService _mouseHookService;
     private readonly MouseMovementService _mouseMovementService;
@@ -181,7 +181,7 @@ public partial class MainWindow : Window
         var poweredOn = status is WigglerStatus.Armed or WigglerStatus.Running;
         ApplyToggleVisualState(poweredOn);
 
-        var knobTarget = poweredOn ? -174d : 0d;
+        var knobTarget = poweredOn ? -162d : 0d;
         var glowTarget = poweredOn ? 0.88d : 0.28d;
         var glowScale = poweredOn ? 1.08d : 0.92d;
 
@@ -218,7 +218,7 @@ public partial class MainWindow : Window
 
     private void ApplyToggleVisualState(bool poweredOn)
     {
-        ToggleKnobTransform.X = poweredOn ? -174d : 0d;
+        ToggleKnobTransform.X = poweredOn ? -162d : 0d;
         ToggleGlow.Opacity = poweredOn ? 0.72d : 0.28d;
         ToggleGlowScale.ScaleX = 1d;
         ToggleGlowScale.ScaleY = 1d;

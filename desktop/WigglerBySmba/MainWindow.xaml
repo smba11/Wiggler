@@ -6,10 +6,12 @@
         mc:Ignorable="d"
         Title="WIGGLER by SMBA"
         Width="1040"
-        Height="860"
-        MinWidth="900"
-        MinHeight="700"
+        Height="780"
+        MinWidth="860"
+        MinHeight="640"
         WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
         Background="{DynamicResource WindowBackgroundBrush}">
     <Window.Resources>
         <DropShadowEffect x:Key="ShellShadow"
@@ -47,6 +49,15 @@
                                 <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                                 <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
                             </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -60,11 +71,11 @@
         </Style>
 
         <Style x:Key="StatusChipStyle" TargetType="Border">
-            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="Padding" Value="20,10" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="22" />
+            <Setter Property="CornerRadius" Value="24" />
         </Style>
 
         <Style TargetType="ComboBox">
@@ -136,9 +147,14 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
                                 <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="ComboBorder" Property="BorderThickness" Value="2" />
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="ComboBorder" Property="BorderThickness" Value="2" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -179,7 +195,7 @@
         </Style>
     </Window.Resources>
 
-    <Grid Margin="20">
+    <Grid Margin="18">
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="MainColumn" Width="*" />
             <ColumnDefinition x:Name="SettingsSpacerColumn" Width="0" />
@@ -188,7 +204,7 @@
 
         <Border x:Name="MainShell"
                 Grid.Column="0"
-                Padding="30"
+                Padding="24"
                 Background="{DynamicResource PanelBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                 BorderThickness="1"
@@ -252,17 +268,23 @@
                                 VerticalAlignment="Top">
                         <Border Style="{StaticResource StatusChipStyle}"
                                 Margin="0,0,14,0">
-                            <StackPanel Orientation="Horizontal">
+                            <Grid MinWidth="92">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
                                 <Ellipse x:Name="StatusDot"
                                          Width="10"
                                          Height="10"
-                                         Margin="0,0,10,0"
+                                         Margin="0,0,12,0"
                                          Fill="{Binding StatusDotBrush}"
                                          VerticalAlignment="Center" />
-                                <TextBlock FontSize="14"
+                                <TextBlock Grid.Column="1"
+                                           VerticalAlignment="Center"
+                                           FontSize="14"
                                            Foreground="{DynamicResource AccentBrush}"
                                            Text="{Binding StatusLabel}" />
-                            </StackPanel>
+                            </Grid>
                         </Border>
 
                         <Button Style="{StaticResource IconBubbleButtonStyle}"
@@ -276,11 +298,11 @@
                 <Grid Grid.Row="1">
                     <StackPanel VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
-                                Width="520"
-                                Margin="0,-18,0,0">
+                                Width="460"
+                                Margin="0,-10,0,0">
                         <Border x:Name="ToggleGlow"
-                                Width="296"
-                                Height="132"
+                                Width="282"
+                                Height="124"
                                 HorizontalAlignment="Center"
                                 Background="{StaticResource HeroGlowBrush}"
                                 CornerRadius="66"
@@ -295,36 +317,38 @@
                         </Border>
 
                         <Button x:Name="ToggleButton"
-                                Width="304"
-                                Height="104"
-                                Margin="0,-118,0,0"
+                                Width="286"
+                                Height="98"
+                                Margin="0,-111,0,0"
                                 Command="{Binding TogglePowerCommand}"
                                 Background="Transparent"
                                 BorderThickness="0"
                                 Padding="0"
                                 Cursor="Hand">
                             <Border x:Name="ToggleTrack"
-                                    Width="304"
-                                    Height="104"
+                                    Width="286"
+                                    Height="98"
                                     Background="{Binding ToggleTrackBrush}"
                                     BorderBrush="{Binding ToggleTrackBorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="52">
-                                <Grid Margin="14">
+                                    CornerRadius="49"
+                                    SnapsToDevicePixels="True">
+                                <Grid Margin="12">
                                     <TextBlock Margin="42,0,0,0"
                                                VerticalAlignment="Center"
                                                HorizontalAlignment="Left"
-                                               FontSize="28"
+                                               FontSize="24"
                                                FontWeight="SemiBold"
                                                Foreground="#F6FAFB"
                                                Panel.ZIndex="1"
                                                Text="{Binding ToggleStateWord}" />
                                     <Border x:Name="ToggleKnob"
-                                            Width="78"
-                                            Height="78"
+                                            Width="74"
+                                            Height="74"
                                             HorizontalAlignment="Right"
                                             Background="#F6F7F8"
-                                            CornerRadius="39">
+                                            CornerRadius="37"
+                                            SnapsToDevicePixels="True">
                                         <Border.RenderTransform>
                                             <TranslateTransform x:Name="ToggleKnobTransform" X="0" />
                                         </Border.RenderTransform>
@@ -339,10 +363,10 @@
                             </Border>
                         </Button>
 
-                        <TextBlock Margin="0,38,0,0"
+                        <TextBlock Margin="0,32,0,0"
                                    HorizontalAlignment="Center"
-                                   MaxWidth="520"
-                                   FontSize="42"
+                                   MaxWidth="460"
+                                   FontSize="36"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource AccentBrush}"
                                    Text="{Binding HeroLabel}"
@@ -357,9 +381,9 @@
                                    TextAlignment="Center"
                                    TextWrapping="Wrap" />
 
-                        <Border Width="210"
+                        <Border Width="200"
                                 Height="1"
-                                Margin="0,34,0,22"
+                                Margin="0,30,0,20"
                                 HorizontalAlignment="Center"
                                 Background="{DynamicResource ThemeChipBorderBrush}" />
 
@@ -390,14 +414,16 @@
                     <TextBlock Margin="12,0,0,0"
                                FontSize="14"
                                Foreground="{DynamicResource SubtleTextBrush}"
-                               Text="{Binding TrayReadyBody}" />
+                               MaxWidth="700"
+                               Text="{Binding TrayReadyBody}"
+                               TextWrapping="Wrap" />
                 </StackPanel>
             </Grid>
         </Border>
 
         <Border x:Name="SettingsShell"
                 Grid.Column="2"
-                Padding="28"
+                Padding="22"
                 Background="{DynamicResource SettingsBackgroundBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                 BorderThickness="1"

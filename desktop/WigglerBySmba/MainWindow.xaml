@@ -276,7 +276,7 @@
                 <Grid Grid.Row="1">
                     <StackPanel VerticalAlignment="Center"
                                 HorizontalAlignment="Center"
-                                Width="360"
+                                Width="520"
                                 Margin="0,-18,0,0">
                         <Border x:Name="ToggleGlow"
                                 Width="296"
@@ -301,8 +301,11 @@
                                 Command="{Binding TogglePowerCommand}"
                                 Background="Transparent"
                                 BorderThickness="0"
+                                Padding="0"
                                 Cursor="Hand">
                             <Border x:Name="ToggleTrack"
+                                    Width="304"
+                                    Height="104"
                                     Background="{Binding ToggleTrackBrush}"
                                     BorderBrush="{Binding ToggleTrackBorderBrush}"
                                     BorderThickness="1"
@@ -314,6 +317,7 @@
                                                FontSize="28"
                                                FontWeight="SemiBold"
                                                Foreground="#F6FAFB"
+                                               Panel.ZIndex="1"
                                                Text="{Binding ToggleStateWord}" />
                                     <Border x:Name="ToggleKnob"
                                             Width="78"
@@ -337,16 +341,21 @@
 
                         <TextBlock Margin="0,38,0,0"
                                    HorizontalAlignment="Center"
+                                   MaxWidth="520"
                                    FontSize="42"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource AccentBrush}"
-                                   Text="{Binding HeroLabel}" />
+                                   Text="{Binding HeroLabel}"
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap" />
                         <TextBlock Margin="0,12,0,0"
                                    HorizontalAlignment="Center"
+                                   MaxWidth="420"
                                    FontSize="16"
                                    Foreground="{DynamicResource SubtleTextBrush}"
                                    Text="{Binding StatusDetail}"
-                                   TextAlignment="Center" />
+                                   TextAlignment="Center"
+                                   TextWrapping="Wrap" />
 
                         <Border Width="210"
                                 Height="1"

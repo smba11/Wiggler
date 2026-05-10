@@ -121,6 +121,9 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             OnPropertyChanged(nameof(StatusDetail));
             OnPropertyChanged(nameof(ToggleButtonLabel));
             OnPropertyChanged(nameof(ToggleStateWord));
+            OnPropertyChanged(nameof(IsPoweredOn));
+            OnPropertyChanged(nameof(ToggleTrackBrush));
+            OnPropertyChanged(nameof(ToggleTrackBorderBrush));
             OnPropertyChanged(nameof(ToggleButtonBrush));
             OnPropertyChanged(nameof(StatusChipBrush));
             OnPropertyChanged(nameof(StatusChipTextBrush));
@@ -183,6 +186,13 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     public string ToggleButtonLabel => _isEnabled ? Text.ToggleOffLabel : Text.ToggleOnLabel;
     public string ToggleStateWord => _isEnabled ? "ON" : "OFF";
+    public bool IsPoweredOn => _isEnabled;
+    public Brush ToggleTrackBrush => _isEnabled
+        ? new SolidColorBrush(Color.FromRgb(18, 46, 44))
+        : new SolidColorBrush(Color.FromRgb(29, 34, 41));
+    public Brush ToggleTrackBorderBrush => _isEnabled
+        ? new SolidColorBrush(Color.FromRgb(27, 199, 165))
+        : new SolidColorBrush(Color.FromRgb(57, 66, 77));
 
     public Brush ToggleButtonBrush => _isEnabled
         ? new SolidColorBrush(Color.FromRgb(153, 27, 27))

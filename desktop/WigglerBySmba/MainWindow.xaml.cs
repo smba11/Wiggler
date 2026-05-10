@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media.Animation;
 using WigglerBySmba.Models;
 using WigglerBySmba.Services;
 using WigglerBySmba.ViewModels;
@@ -8,8 +9,8 @@ namespace WigglerBySmba;
 
 public partial class MainWindow : Window
 {
-    private const double CompactWidth = 1060;
-    private const double ExpandedWidth = 1480;
+    private const double CompactWidth = 1040;
+    private const double ExpandedWidth = 1460;
     private const double CompactMinWidth = 900;
     private const double ExpandedMinWidth = 1260;
     private readonly SettingsService _settingsService;
@@ -37,7 +38,11 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
 
         _viewModel.RequestTutorial += (_, _) => ShowTutorialDialog();
-        _viewModel.StatusChanged += (_, status) => _trayIconService.UpdateStatus(status);
+        _viewModel.StatusChanged += (_, status) =>
+        {
+            _trayIconService.UpdateStatus(status);
+            AnimateStatusChange(status);
+        };
         _viewModel.ThemeChanged += (_, _) => _themeService.ApplyTheme(_viewModel.SelectedThemeMode, _viewModel.SelectedThemeVibe);
         _viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
@@ -65,6 +70,7 @@ public partial class MainWindow : Window
     {
         _viewModel.Initialize();
         ApplySettingsLayout(_viewModel.IsSettingsOpen, false);
+        ApplyToggleVisualState(_viewModel.IsPoweredOn);
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -163,10 +169,58 @@ public partial class MainWindow : Window
         {
             To = targetWidth,
             Duration = TimeSpan.FromMilliseconds(220),
-            EasingFunction = new System.Windows.Media.Animation.CubicEase
+            EasingFunction = new CubicEase
             {
-                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut
+                EasingMode = EasingMode.EaseOut
             }
         });
+    }
+
+    private void AnimateStatusChange(WigglerStatus status)
+    {
+        var poweredOn = status is WigglerStatus.Armed or WigglerStatus.Running;
+        ApplyToggleVisualState(poweredOn);
+
+        var knobTarget = poweredOn ? -174d : 0d;
+        var glowTarget = poweredOn ? 0.88d : 0.28d;
+        var glowScale = poweredOn ? 1.08d : 0.92d;
+
+        ToggleKnobTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, new DoubleAnimation
+        {
+            To = knobTarget,
+            Duration = TimeSpan.FromMilliseconds(320),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        });
+
+        ToggleGlow.BeginAnimation(OpacityProperty, new DoubleAnimation
+        {
+            To = glowTarget,
+            Duration = TimeSpan.FromMilliseconds(260),
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        });
+
+        ToggleGlowScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, new DoubleAnimation
+        {
+            To = glowScale,
+            Duration = TimeSpan.FromMilliseconds(260),
+            AutoReverse = poweredOn,
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        });
+
+        ToggleGlowScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, new DoubleAnimation
+        {
+            To = glowScale,
+            Duration = TimeSpan.FromMilliseconds(260),
+            AutoReverse = poweredOn,
+            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+        });
+    }
+
+    private void ApplyToggleVisualState(bool poweredOn)
+    {
+        ToggleKnobTransform.X = poweredOn ? -174d : 0d;
+        ToggleGlow.Opacity = poweredOn ? 0.72d : 0.28d;
+        ToggleGlowScale.ScaleX = 1d;
+        ToggleGlowScale.ScaleY = 1d;
     }
 }

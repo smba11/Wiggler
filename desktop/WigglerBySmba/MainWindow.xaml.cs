@@ -8,6 +8,10 @@ namespace WigglerBySmba;
 
 public partial class MainWindow : Window
 {
+    private const double CompactWidth = 1060;
+    private const double ExpandedWidth = 1480;
+    private const double CompactMinWidth = 900;
+    private const double ExpandedMinWidth = 1260;
     private readonly SettingsService _settingsService;
     private readonly MouseHookService _mouseHookService;
     private readonly MouseMovementService _mouseMovementService;
@@ -35,6 +39,7 @@ public partial class MainWindow : Window
         _viewModel.RequestTutorial += (_, _) => ShowTutorialDialog();
         _viewModel.StatusChanged += (_, status) => _trayIconService.UpdateStatus(status);
         _viewModel.ThemeChanged += (_, _) => _themeService.ApplyTheme(_viewModel.SelectedThemeMode, _viewModel.SelectedThemeVibe);
+        _viewModel.PropertyChanged += OnViewModelPropertyChanged;
 
         _trayIconService.OpenRequested += (_, _) => RevealWindow();
         _trayIconService.SettingsRequested += (_, _) =>
@@ -59,6 +64,15 @@ public partial class MainWindow : Window
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _viewModel.Initialize();
+        ApplySettingsLayout(_viewModel.IsSettingsOpen, false);
+    }
+
+    private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(MainViewModel.IsSettingsOpen))
+        {
+            ApplySettingsLayout(_viewModel.IsSettingsOpen, true);
+        }
     }
 
     private void OnStateChanged(object? sender, EventArgs e)
@@ -128,5 +142,31 @@ public partial class MainWindow : Window
         _isDisposed = true;
         _viewModel.Dispose();
         _trayIconService.Dispose();
+    }
+
+    private void ApplySettingsLayout(bool isOpen, bool animateWidth)
+    {
+        SettingsSpacerColumn.Width = isOpen ? new GridLength(28) : new GridLength(0);
+        SettingsColumn.Width = isOpen ? new GridLength(1.02, GridUnitType.Star) : new GridLength(0);
+        SettingsShell.Visibility = isOpen ? Visibility.Visible : Visibility.Collapsed;
+
+        MinWidth = isOpen ? ExpandedMinWidth : CompactMinWidth;
+        var targetWidth = isOpen ? ExpandedWidth : CompactWidth;
+
+        if (!animateWidth)
+        {
+            Width = targetWidth;
+            return;
+        }
+
+        BeginAnimation(WidthProperty, new System.Windows.Media.Animation.DoubleAnimation
+        {
+            To = targetWidth,
+            Duration = TimeSpan.FromMilliseconds(220),
+            EasingFunction = new System.Windows.Media.Animation.CubicEase
+            {
+                EasingMode = System.Windows.Media.Animation.EasingMode.EaseOut
+            }
+        });
     }
 }

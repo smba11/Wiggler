@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="WIGGLER by SMBA"
-        Width="1380"
-        Height="940"
-        MinWidth="1120"
+        Width="1060"
+        Height="900"
+        MinWidth="900"
         MinHeight="760"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}">
@@ -117,13 +117,13 @@
         </Style>
 
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="42" />
+            <Setter Property="Height" Value="46" />
             <Setter Property="MaxDropDownHeight" Value="260" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
             <Setter Property="FontSize" Value="14" />
-            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Padding" Value="18,0" />
             <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
             <Setter Property="Template">
                 <Setter.Value>
@@ -133,13 +133,13 @@
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="15">
+                                    CornerRadius="23">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="36" />
+                                        <ColumnDefinition Width="42" />
                                     </Grid.ColumnDefinitions>
-                                    <ContentPresenter Margin="14,0,0,0"
+                                    <ContentPresenter Margin="18,0,0,0"
                                                       VerticalAlignment="Center"
                                                       Content="{TemplateBinding SelectionBoxItem}" />
                                     <ToggleButton Grid.ColumnSpan="2"
@@ -172,7 +172,7 @@
                                         Background="{DynamicResource SettingsPanelBrush}"
                                         BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="18"
+                                        CornerRadius="23"
                                         Effect="{StaticResource ShellShadow}">
                                     <ScrollViewer Margin="6"
                                                   CanContentScroll="False"
@@ -205,7 +205,7 @@
                         <Border x:Name="ItemBorder"
                                 Margin="2"
                                 Background="Transparent"
-                                CornerRadius="12">
+                                CornerRadius="18">
                             <ContentPresenter Margin="12,0"
                                               VerticalAlignment="Center" />
                         </Border>
@@ -230,12 +230,13 @@
 
     <Grid Margin="24">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2.1*" />
-            <ColumnDefinition Width="28" />
-            <ColumnDefinition Width="1.02*" />
+            <ColumnDefinition x:Name="MainColumn" Width="*" />
+            <ColumnDefinition x:Name="SettingsSpacerColumn" Width="0" />
+            <ColumnDefinition x:Name="SettingsColumn" Width="0" />
         </Grid.ColumnDefinitions>
 
-        <Border Grid.Column="0"
+        <Border x:Name="MainShell"
+                Grid.Column="0"
                 Padding="28"
                 Background="{DynamicResource PanelBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
@@ -581,7 +582,8 @@
             </Grid>
         </Border>
 
-        <Border Grid.Column="2"
+        <Border x:Name="SettingsShell"
+                Grid.Column="2"
                 Padding="24"
                 Background="{DynamicResource SettingsBackgroundBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"

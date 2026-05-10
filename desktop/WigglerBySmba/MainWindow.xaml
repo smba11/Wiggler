@@ -8,17 +8,22 @@
         Width="1060"
         Height="900"
         MinWidth="900"
-        MinHeight="760"
+        MinHeight="720"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource WindowBackgroundBrush}">
     <Window.Resources>
         <DropShadowEffect x:Key="ShellShadow"
-                          BlurRadius="42"
+                          BlurRadius="44"
                           ShadowDepth="0"
-                          Opacity="0.28"
-                          Color="#99000000" />
+                          Opacity="0.34"
+                          Color="#C0000000" />
 
-        <Style x:Key="UtilityButtonStyle" TargetType="Button">
+        <LinearGradientBrush x:Key="HeroGlowBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#2E1BC7A5" Offset="0" />
+            <GradientStop Color="#081BC7A5" Offset="1" />
+        </LinearGradientBrush>
+
+        <Style x:Key="BubbleButtonStyle" TargetType="Button">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
             <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
@@ -48,67 +53,64 @@
             </Setter>
         </Style>
 
-        <Style x:Key="IconButtonStyle" TargetType="Button" BasedOn="{StaticResource UtilityButtonStyle}">
-            <Setter Property="Width" Value="52" />
-            <Setter Property="Height" Value="52" />
+        <Style x:Key="IconBubbleButtonStyle" TargetType="Button" BasedOn="{StaticResource BubbleButtonStyle}">
+            <Setter Property="Width" Value="64" />
+            <Setter Property="Height" Value="64" />
             <Setter Property="Padding" Value="0" />
         </Style>
 
-        <Style x:Key="PrimaryToggleButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{DynamicResource ButtonTextBrush}" />
-            <Setter Property="Background" Value="{Binding ToggleButtonBrush}" />
-            <Setter Property="BorderBrush" Value="{Binding ToggleButtonBrush}" />
-            <Setter Property="BorderThickness" Value="0" />
+        <Style x:Key="StatusChipStyle" TargetType="Border">
+            <Setter Property="Padding" Value="18,10" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="22" />
+        </Style>
+
+        <Style x:Key="TogglePillStyle" TargetType="Button">
+            <Setter Property="Foreground" Value="#F6FAFB" />
+            <Setter Property="Background" Value="#122E2C" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Width" Value="304" />
+            <Setter Property="Height" Value="104" />
             <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontSize" Value="18" />
-            <Setter Property="FontWeight" Value="SemiBold" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="ToggleBorder"
+                        <Border x:Name="ToggleRoot"
                                 Background="{TemplateBinding Background}"
-                                CornerRadius="38"
-                                Padding="12">
-                            <Grid>
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="52">
+                            <Grid Margin="14">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
                                 </Grid.ColumnDefinitions>
-                                <Border Width="78"
+                                <TextBlock Margin="42,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="28"
+                                           FontWeight="SemiBold"
+                                           Foreground="{TemplateBinding Foreground}"
+                                           Text="{Binding ToggleStateWord}" />
+                                <Border Grid.Column="1"
+                                        Width="78"
                                         Height="78"
-                                        Background="#22000000"
+                                        Background="#F6F7F8"
                                         CornerRadius="39">
-                                    <Border Width="58"
-                                            Height="58"
-                                            HorizontalAlignment="Center"
-                                            VerticalAlignment="Center"
-                                            Background="#30FFFFFF"
-                                            CornerRadius="29">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="30"
-                                                   Foreground="{DynamicResource ButtonTextBrush}"
-                                                   Text="&#xE768;" />
-                                    </Border>
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="20"
+                                                          ShadowDepth="2"
+                                                          Opacity="0.22"
+                                                          Color="#FF000000" />
+                                    </Border.Effect>
                                 </Border>
-                                <StackPanel Grid.Column="1"
-                                            Margin="22,0,22,0"
-                                            VerticalAlignment="Center">
-                                    <ContentPresenter HorizontalAlignment="Left"
-                                                      VerticalAlignment="Center" />
-                                    <TextBlock Margin="0,6,0,0"
-                                               FontSize="13"
-                                               FontWeight="Normal"
-                                               Foreground="{DynamicResource ButtonTextBrush}"
-                                               Opacity="0.84"
-                                               Text="{Binding PatternSummary}" />
-                                </StackPanel>
                             </Grid>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ToggleBorder" Property="Opacity" Value="0.94" />
+                                <Setter TargetName="ToggleRoot" Property="Opacity" Value="0.95" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -133,11 +135,11 @@
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="23">
+                                    CornerRadius="15">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="42" />
+                                        <ColumnDefinition Width="40" />
                                     </Grid.ColumnDefinitions>
                                     <ContentPresenter Margin="18,0,0,0"
                                                       VerticalAlignment="Center"
@@ -172,7 +174,7 @@
                                         Background="{DynamicResource SettingsPanelBrush}"
                                         BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="23"
+                                        CornerRadius="18"
                                         Effect="{StaticResource ShellShadow}">
                                     <ScrollViewer Margin="6"
                                                   CanContentScroll="False"
@@ -205,7 +207,7 @@
                         <Border x:Name="ItemBorder"
                                 Margin="2"
                                 Background="Transparent"
-                                CornerRadius="18">
+                                CornerRadius="12">
                             <ContentPresenter Margin="12,0"
                                               VerticalAlignment="Center" />
                         </Border>
@@ -224,11 +226,11 @@
 
         <Style TargetType="Slider">
             <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
-            <Setter Property="Margin" Value="0,10,0,0" />
+            <Setter Property="Margin" Value="0,4,0,0" />
         </Style>
     </Window.Resources>
 
-    <Grid Margin="24">
+    <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="MainColumn" Width="*" />
             <ColumnDefinition x:Name="SettingsSpacerColumn" Width="0" />
@@ -237,7 +239,7 @@
 
         <Border x:Name="MainShell"
                 Grid.Column="0"
-                Padding="28"
+                Padding="30"
                 Background="{DynamicResource PanelBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                 BorderThickness="1"
@@ -257,32 +259,40 @@
                     </Grid.ColumnDefinitions>
 
                     <StackPanel Orientation="Horizontal">
-                        <Border Width="42"
-                                Height="42"
-                                Margin="0,0,14,0"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="14">
-                            <Viewbox Margin="9">
-                                <Canvas Width="26" Height="26">
-                                    <Path Stroke="{DynamicResource AccentBrush}"
-                                          StrokeThickness="1.9"
-                                          StrokeLineJoin="Round"
-                                          StrokeStartLineCap="Round"
-                                          StrokeEndLineCap="Round"
-                                          Fill="Transparent"
-                                          Data="M 4 15 L 14 2 L 16 11 L 23 11 L 9 25 L 10.5 16 Z" />
-                                </Canvas>
-                            </Viewbox>
+                        <Border Width="40"
+                                Height="64"
+                                Margin="0,0,16,0"
+                                Background="Transparent">
+                            <Canvas Width="40" Height="64">
+                                <Path Stroke="#F4F6F8"
+                                      StrokeThickness="2.2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Fill="Transparent"
+                                      Data="M 10 26 C 15 16, 24 9, 32 10" />
+                                <Path Stroke="#F4F6F8"
+                                      StrokeThickness="2.2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Fill="Transparent"
+                                      Data="M 7 38 C 13 21, 23 13, 35 15" />
+                                <Path Stroke="#F4F6F8"
+                                      StrokeThickness="2.2"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round"
+                                      Fill="Transparent"
+                                      Data="M 7 42 L 21 22 L 24 35 L 33 35 L 15 56 L 18 42 Z" />
+                            </Canvas>
                         </Border>
-
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock FontSize="18"
+                            <TextBlock FontSize="28"
                                        Foreground="{DynamicResource TextBrush}"
                                        Text="{Binding BrandTitle}" />
-                            <TextBlock Margin="0,2,0,0"
-                                       FontSize="13"
+                            <TextBlock Margin="0,4,0,0"
+                                       FontSize="14"
                                        Foreground="{DynamicResource SubtleTextBrush}"
                                        Text="{Binding BrandSubtitle}" />
                         </StackPanel>
@@ -291,12 +301,8 @@
                     <StackPanel Grid.Column="1"
                                 Orientation="Horizontal"
                                 VerticalAlignment="Top">
-                        <Border Padding="18,10"
-                                Margin="0,0,12,0"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="22">
+                        <Border Style="{StaticResource StatusChipStyle}"
+                                Margin="0,0,14,0">
                             <StackPanel Orientation="Horizontal">
                                 <Ellipse x:Name="StatusDot"
                                          Width="10"
@@ -304,287 +310,96 @@
                                          Margin="0,0,10,0"
                                          Fill="{Binding StatusDotBrush}"
                                          VerticalAlignment="Center" />
-                                <TextBlock FontSize="13"
-                                           Foreground="{DynamicResource TextBrush}"
+                                <TextBlock FontSize="14"
+                                           Foreground="{DynamicResource AccentBrush}"
                                            Text="{Binding StatusLabel}" />
                             </StackPanel>
                         </Border>
 
-                        <Button Style="{StaticResource IconButtonStyle}"
+                        <Button Style="{StaticResource IconBubbleButtonStyle}"
                                 Command="{Binding ToggleSettingsCommand}"
                                 Content="&#xE713;"
                                 FontFamily="Segoe Fluent Icons"
-                                FontSize="16" />
+                                FontSize="18" />
                     </StackPanel>
                 </Grid>
 
-                <Grid Grid.Row="1"
-                      Margin="0,28,0,28">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
+                <Grid Grid.Row="1">
+                    <StackPanel VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                Width="360">
+                        <Border Width="300"
+                                Height="134"
+                                HorizontalAlignment="Center"
+                                Background="{StaticResource HeroGlowBrush}"
+                                CornerRadius="67"
+                                Opacity="0.78"
+                                IsHitTestVisible="False">
+                            <Border.Effect>
+                                <BlurEffect Radius="28" />
+                            </Border.Effect>
+                        </Border>
 
-                    <StackPanel HorizontalAlignment="Center"
-                                Margin="0,18,0,0">
-                        <TextBlock HorizontalAlignment="Center"
-                                   FontSize="16"
+                        <Button Margin="0,-118,0,0"
+                                Style="{StaticResource TogglePillStyle}"
+                                Command="{Binding TogglePowerCommand}">
+                            <TextBlock Text="{Binding ToggleStateWord}" />
+                        </Button>
+
+                        <TextBlock Margin="0,40,0,0"
+                                   HorizontalAlignment="Center"
+                                   FontSize="42"
                                    FontWeight="SemiBold"
                                    Foreground="{DynamicResource AccentBrush}"
-                                   Text="{Binding HeroEyebrow}" />
-                        <TextBlock Margin="0,18,0,0"
+                                   Text="{Binding HeroLabel}" />
+                        <TextBlock Margin="0,10,0,0"
                                    HorizontalAlignment="Center"
-                                   FontSize="52"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextBrush}"
-                                   Text="{Binding HeroLabel}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap" />
-                        <TextBlock Margin="0,12,0,0"
-                                   HorizontalAlignment="Center"
-                                   FontSize="15"
-                                   LineHeight="24"
+                                   FontSize="16"
                                    Foreground="{DynamicResource SubtleTextBrush}"
                                    Text="{Binding StatusDetail}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
+                                   TextAlignment="Center" />
 
-                    <StackPanel Grid.Row="1"
-                                Margin="0,38,0,0"
-                                HorizontalAlignment="Center">
-                        <Button Width="360"
-                                Height="102"
+                        <Border Width="210"
+                                Height="1"
+                                Margin="0,36,0,22"
                                 HorizontalAlignment="Center"
-                                Command="{Binding TogglePowerCommand}"
-                                Style="{StaticResource PrimaryToggleButtonStyle}">
-                            <TextBlock Text="{Binding ToggleButtonLabel}" />
-                        </Button>
-                        <TextBlock Margin="0,16,0,0"
-                                   HorizontalAlignment="Center"
-                                   FontSize="14"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding BehaviorSummary}" />
-                    </StackPanel>
+                                Background="{DynamicResource ThemeChipBorderBrush}" />
 
-                    <Grid Grid.Row="2" Margin="0,44,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="18" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-
-                        <Border Padding="24"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="22">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="44"
-                                        Height="44"
-                                        Background="{DynamicResource SurfaceMutedBrush}"
-                                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="14">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource AccentBrush}"
-                                               Text="&#xE115;" />
-                                </Border>
-                                <StackPanel Grid.Column="1" Margin="16,0,0,0">
-                                    <TextBlock FontSize="13"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding PatternCardTitle}" />
-                                    <TextBlock Margin="0,14,0,0"
-                                               FontSize="24"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding LocalizedSelectedPattern}" />
-                                    <TextBlock Margin="0,12,0,0"
-                                               FontSize="14"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding PatternSummary}"
-                                               TextWrapping="Wrap" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="2"
-                                           VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="16"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="&#xE72A;" />
-                            </Grid>
-                        </Border>
-
-                        <Border Grid.Column="2"
-                                Padding="24"
-                                Background="{DynamicResource SurfaceBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="22">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Border Width="44"
-                                        Height="44"
-                                        Background="{DynamicResource SurfaceMutedBrush}"
-                                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="14">
-                                    <TextBlock HorizontalAlignment="Center"
-                                               VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="&#xE823;" />
-                                </Border>
-                                <StackPanel Grid.Column="1" Margin="16,0,0,0">
-                                    <TextBlock FontSize="13"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding IdleDelayCardTitle}" />
-                                    <TextBlock Margin="0,14,0,0"
-                                               FontSize="24"
-                                               FontWeight="SemiBold"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding IdleDelayDisplay}" />
-                                    <TextBlock Margin="0,12,0,0"
-                                               FontSize="14"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding StatusDetail}" />
-                                </StackPanel>
-                                <TextBlock Grid.Column="2"
-                                           VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="16"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="&#xE72A;" />
-                            </Grid>
-                        </Border>
-                    </Grid>
-
-                    <Border Grid.Row="3"
-                            Margin="0,18,0,0"
-                            Padding="24"
-                            Background="{DynamicResource SurfaceBrush}"
-                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                            BorderThickness="1"
-                            CornerRadius="22">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Border Width="44"
-                                    Height="44"
-                                    Background="{DynamicResource SurfaceMutedBrush}"
-                                    BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="14">
-                                <TextBlock HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="&#xE73E;" />
-                            </Border>
-                            <StackPanel Grid.Column="1" Margin="16,0,0,0">
-                                <TextBlock FontSize="13"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding TakeoverTitle}" />
-                                <TextBlock Margin="0,12,0,0"
-                                           FontSize="20"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding TakeoverValue}" />
-                                <TextBlock Margin="0,12,0,0"
-                                           FontSize="14"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding TrayReadyBody}"
-                                           TextWrapping="Wrap" />
-                            </StackPanel>
-                            <TextBlock Grid.Column="2"
-                                       VerticalAlignment="Center"
-                                       FontFamily="Segoe Fluent Icons"
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Center">
+                            <TextBlock FontFamily="Segoe Fluent Icons"
                                        FontSize="16"
                                        Foreground="{DynamicResource SubtleTextBrush}"
-                                       Text="&#xE72A;" />
-                        </Grid>
-                    </Border>
+                                       Text="&#xE115;" />
+                            <TextBlock Margin="14,0,0,0"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                       Text="{Binding PatternLabel}" />
+                            <TextBlock Margin="6,0,0,0"
+                                       FontSize="15"
+                                       Foreground="{DynamicResource TextBrush}"
+                                       Text="{Binding LocalizedSelectedPattern}" />
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
 
-                <Border Grid.Row="2"
-                        Padding="18"
-                        Background="{DynamicResource SurfaceBrush}"
-                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                        BorderThickness="1"
-                        CornerRadius="22">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Orientation="Horizontal">
-                            <Border Width="48"
-                                    Height="48"
-                                    Margin="0,0,14,0"
-                                    Background="{DynamicResource SurfaceMutedBrush}"
-                                    BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="15">
-                                <TextBlock HorizontalAlignment="Center"
-                                           VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="20"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="&#xE7F4;" />
-                            </Border>
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock FontSize="16"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding TrayReadyTitle}" />
-                                <TextBlock Margin="0,6,0,0"
-                                           FontSize="14"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding TrayReadyBody}" />
-                            </StackPanel>
-                        </StackPanel>
-
-                        <StackPanel Grid.Column="1"
-                                    Orientation="Horizontal"
-                                    VerticalAlignment="Center">
-                            <Button MinWidth="146"
-                                    Height="46"
-                                    Margin="0,0,10,0"
-                                    Style="{StaticResource UtilityButtonStyle}"
-                                    Command="{Binding ReplayTutorialCommand}"
-                                    Content="{Binding ReplayTutorialLabel}" />
-                            <Button MinWidth="160"
-                                    Height="46"
-                                    Style="{StaticResource UtilityButtonStyle}"
-                                    Command="{Binding ToggleSettingsCommand}"
-                                    Content="{Binding SettingsButtonLabel}" />
-                        </StackPanel>
-                    </Grid>
-                </Border>
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal">
+                    <TextBlock FontFamily="Segoe Fluent Icons"
+                               FontSize="18"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="&#xE7F4;" />
+                    <TextBlock Margin="12,0,0,0"
+                               FontSize="14"
+                               Foreground="{DynamicResource SubtleTextBrush}"
+                               Text="{Binding TrayReadyBody}" />
+                </StackPanel>
             </Grid>
         </Border>
 
         <Border x:Name="SettingsShell"
                 Grid.Column="2"
-                Padding="24"
+                Padding="28"
                 Background="{DynamicResource SettingsBackgroundBrush}"
                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                 BorderThickness="1"
@@ -602,328 +417,333 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock FontSize="28"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource TextBrush}"
-                                   Text="{Binding SettingsHeaderTitle}" />
-                        <TextBlock Margin="0,8,0,0"
-                                   FontSize="14"
-                                   LineHeight="22"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding SettingsSubtitle}"
-                                   TextWrapping="Wrap" />
-                    </StackPanel>
-
+                    <TextBlock FontSize="28"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextBrush}"
+                               Text="{Binding SettingsHeaderTitle}" />
                     <Button Grid.Column="1"
-                            Style="{StaticResource IconButtonStyle}"
+                            Style="{StaticResource IconBubbleButtonStyle}"
+                            Width="52"
+                            Height="52"
                             Command="{Binding ToggleSettingsCommand}"
                             Content="&#xE711;"
                             FontFamily="Segoe Fluent Icons"
-                            FontSize="14"
-                            Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}" />
+                            FontSize="14" />
                 </Grid>
 
                 <ScrollViewer Grid.Row="1"
-                              Margin="0,22,0,0"
+                              Margin="0,26,0,0"
                               VerticalScrollBarVisibility="Auto">
                     <StackPanel>
-                        <Border Padding="18"
+                        <TextBlock Margin="6,0,0,12"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding BehaviorSectionTitle}" />
+                        <Border Padding="14"
                                 Background="{DynamicResource SettingsPanelBrush}"
                                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="22">
+                                CornerRadius="20">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40"
-                                            Height="40"
-                                            Margin="0,0,12,0"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="14">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="18"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="&#xE713;" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="{Binding BehaviorSectionTitle}" />
-                                        <TextBlock Margin="0,2,0,0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                                   Text="{Binding TrayReadyTitle}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <TextBlock Margin="0,18,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding LaunchInLabel}" />
-                                <ComboBox ItemsSource="{Binding LaunchModeItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedLaunchMode}" />
-                                <TextBlock Margin="0,14,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding CloseBehaviorLabel}" />
-                                <ComboBox ItemsSource="{Binding CloseBehaviorItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedCloseBehavior}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Margin="0,16,0,0"
-                                Padding="18"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="22">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40"
-                                            Height="40"
-                                            Margin="0,0,12,0"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="14">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="18"
-                                                   Foreground="{DynamicResource AccentBrush}"
-                                                   Text="&#xE115;" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="{Binding MovementSectionTitle}" />
-                                        <TextBlock Margin="0,2,0,0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                                   Text="{Binding PatternSummary}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <TextBlock Margin="0,18,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding PatternLabel}" />
-                                <ComboBox ItemsSource="{Binding PatternItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedPattern}" />
-                                <TextBlock Margin="0,14,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding SpeedLabel}" />
-                                <Border Height="42"
-                                        Padding="14,0"
-                                        Background="{DynamicResource SurfaceMutedBrush}"
-                                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="15">
-                                    <TextBlock VerticalAlignment="Center"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding SpeedDisplay}" />
-                                </Border>
-                                <Slider Minimum="0.5"
-                                        Maximum="3"
-                                        TickFrequency="0.1"
-                                        IsSnapToTickEnabled="True"
-                                        Value="{Binding Speed}" />
-                                <TextBlock Margin="0,12,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding SizeLabel}" />
-                                <Border Height="42"
-                                        Padding="14,0"
-                                        Background="{DynamicResource SurfaceMutedBrush}"
-                                        BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                        BorderThickness="1"
-                                        CornerRadius="15">
-                                    <TextBlock VerticalAlignment="Center"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding SizeDisplay}" />
-                                </Border>
-                                <Slider Minimum="40"
-                                        Maximum="180"
-                                        TickFrequency="5"
-                                        IsSnapToTickEnabled="True"
-                                        Value="{Binding Size}" />
-                            </StackPanel>
-                        </Border>
-
-                        <Border Margin="0,16,0,0"
-                                Padding="18"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="22">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40"
-                                            Height="40"
-                                            Margin="0,0,12,0"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="14">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="18"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="&#xE823;" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="{Binding IdleDelayLabel}" />
-                                        <TextBlock Margin="0,2,0,0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                                   Text="{Binding BehaviorSummary}" />
-                                    </StackPanel>
-                                </StackPanel>
-
-                                <TextBlock Margin="0,18,0,0"
-                                           FontSize="14"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding IdleDelayDisplay}" />
-                                <Slider Minimum="5"
-                                        Maximum="60"
-                                        TickFrequency="1"
-                                        IsSnapToTickEnabled="True"
-                                        Value="{Binding IdleDelaySeconds}" />
-                                <Grid Margin="0,10,0,0">
+                                <Grid Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="210" />
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock FontSize="12"
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
                                                Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="5 sec" />
+                                               Text="&#xE7AD;" />
                                     <TextBlock Grid.Column="1"
-                                               HorizontalAlignment="Right"
-                                               FontSize="12"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding LaunchInLabel}" />
+                                    <ComboBox Grid.Column="2"
+                                              ItemsSource="{Binding LaunchModeItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedLaunchMode}" />
+                                </Grid>
+
+                                <Border Height="1"
+                                        Margin="0,2,0,12"
+                                        Background="{DynamicResource ThemeChipBorderBrush}" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="210" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
                                                Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="60 sec" />
+                                               Text="&#xE8AB;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding CloseBehaviorLabel}" />
+                                    <ComboBox Grid.Column="2"
+                                              ItemsSource="{Binding CloseBehaviorItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedCloseBehavior}" />
                                 </Grid>
                             </StackPanel>
                         </Border>
 
-                        <Border Margin="0,16,0,0"
-                                Padding="18"
+                        <TextBlock Margin="6,24,0,12"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding MovementSectionTitle}" />
+                        <Border Padding="14"
                                 Background="{DynamicResource SettingsPanelBrush}"
                                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="22">
+                                CornerRadius="20">
                             <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40"
-                                            Height="40"
-                                            Margin="0,0,12,0"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="14">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="18"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="&#xE790;" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="{Binding AppearanceSectionTitle}" />
-                                        <TextBlock Margin="0,2,0,0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                                   Text="{Binding LanguageLabel}" />
-                                    </StackPanel>
-                                </StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="210" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="&#xE115;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding PatternLabel}" />
+                                    <ComboBox Grid.Column="2"
+                                              ItemsSource="{Binding PatternItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedPattern}" />
+                                </Grid>
 
-                                <TextBlock Margin="0,18,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding ThemeLabel}" />
-                                <ComboBox ItemsSource="{Binding ThemeModeItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedThemeMode}" />
-                                <TextBlock Margin="0,14,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding ColorVibeLabel}" />
-                                <ComboBox ItemsSource="{Binding ThemeVibeItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedThemeVibe}" />
-                                <TextBlock Margin="0,14,0,6"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding LanguageLabel}" />
-                                <ComboBox ItemsSource="{Binding LanguageItems}"
-                                          DisplayMemberPath="Label"
-                                          SelectedValuePath="Value"
-                                          SelectedValue="{Binding SelectedLanguageCode}" />
+                                <Border Height="1" Margin="0,2,0,12" Background="{DynamicResource ThemeChipBorderBrush}" />
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="74" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="&#xE9E9;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding SpeedLabel}" />
+                                    <Slider Grid.Column="2"
+                                            Minimum="0.5"
+                                            Maximum="3"
+                                            TickFrequency="0.1"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding Speed}" />
+                                    <TextBlock Grid.Column="3"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="{Binding SpeedDisplay}" />
+                                </Grid>
+
+                                <Border Height="1" Margin="0,0,0,12" Background="{DynamicResource ThemeChipBorderBrush}" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="160" />
+                                        <ColumnDefinition Width="74" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="&#xE740;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding SizeLabel}" />
+                                    <Slider Grid.Column="2"
+                                            Minimum="40"
+                                            Maximum="180"
+                                            TickFrequency="5"
+                                            IsSnapToTickEnabled="True"
+                                            Value="{Binding Size}" />
+                                    <TextBlock Grid.Column="3"
+                                               HorizontalAlignment="Right"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="{Binding SizeDisplay}" />
+                                </Grid>
                             </StackPanel>
                         </Border>
 
-                        <Border Margin="0,16,0,0"
-                                Padding="18"
+                        <TextBlock Margin="6,24,0,12"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding IdleDelayLabel}" />
+                        <Border Padding="14"
                                 Background="{DynamicResource SettingsPanelBrush}"
                                 BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                 BorderThickness="1"
-                                CornerRadius="22">
-                            <StackPanel>
-                                <StackPanel Orientation="Horizontal">
-                                    <Border Width="40"
-                                            Height="40"
-                                            Margin="0,0,12,0"
-                                            Background="{DynamicResource SurfaceBrush}"
-                                            BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                            BorderThickness="1"
-                                            CornerRadius="14">
-                                        <TextBlock HorizontalAlignment="Center"
-                                                   VerticalAlignment="Center"
-                                                   FontFamily="Segoe Fluent Icons"
-                                                   FontSize="18"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="&#xE897;" />
-                                    </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="18"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource TextBrush}"
-                                                   Text="{Binding HelpSectionTitle}" />
-                                        <TextBlock Margin="0,2,0,0"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                                   Text="{Binding TrayReadyBody}" />
-                                    </StackPanel>
-                                </StackPanel>
+                                CornerRadius="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="160" />
+                                    <ColumnDefinition Width="74" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center"
+                                           FontFamily="Segoe Fluent Icons"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="&#xE823;" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           Text="{Binding IdleDelayLabel}" />
+                                <Slider Grid.Column="2"
+                                        Minimum="5"
+                                        Maximum="60"
+                                        TickFrequency="1"
+                                        IsSnapToTickEnabled="True"
+                                        Value="{Binding IdleDelaySeconds}" />
+                                <TextBlock Grid.Column="3"
+                                           HorizontalAlignment="Right"
+                                           VerticalAlignment="Center"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="{Binding IdleDelayDisplay}" />
+                            </Grid>
+                        </Border>
 
-                                <Button Margin="0,18,0,0"
-                                        Height="46"
-                                        Style="{StaticResource UtilityButtonStyle}"
-                                        Command="{Binding ReplayTutorialCommand}"
-                                        Content="{Binding ReplayTutorialLabel}" />
+                        <TextBlock Margin="6,24,0,12"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding AppearanceSectionTitle}" />
+                        <Border Padding="14"
+                                Background="{DynamicResource SettingsPanelBrush}"
+                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="20">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="210" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="&#xE790;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding ThemeLabel}" />
+                                    <ComboBox Grid.Column="2"
+                                              ItemsSource="{Binding ThemeModeItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedThemeMode}" />
+                                </Grid>
+
+                                <Border Height="1"
+                                        Margin="0,2,0,12"
+                                        Background="{DynamicResource ThemeChipBorderBrush}" />
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="210" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center"
+                                               FontFamily="Segoe Fluent Icons"
+                                               FontSize="18"
+                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                               Text="&#xE774;" />
+                                    <TextBlock Grid.Column="1"
+                                               Margin="16,0,0,0"
+                                               VerticalAlignment="Center"
+                                               FontSize="15"
+                                               Foreground="{DynamicResource TextBrush}"
+                                               Text="{Binding LanguageLabel}" />
+                                    <ComboBox Grid.Column="2"
+                                              ItemsSource="{Binding LanguageItems}"
+                                              DisplayMemberPath="Label"
+                                              SelectedValuePath="Value"
+                                              SelectedValue="{Binding SelectedLanguageCode}" />
+                                </Grid>
                             </StackPanel>
+                        </Border>
+
+                        <TextBlock Margin="6,24,0,12"
+                                   FontSize="13"
+                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                   Text="{Binding HelpSectionTitle}" />
+                        <Border Padding="14"
+                                Background="{DynamicResource SettingsPanelBrush}"
+                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="20">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock VerticalAlignment="Center"
+                                           FontFamily="Segoe Fluent Icons"
+                                           FontSize="18"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="&#xE897;" />
+                                <TextBlock Grid.Column="1"
+                                           Margin="16,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="15"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           Text="{Binding ReplayTutorialLabel}" />
+                                <Button Grid.Column="2"
+                                        Width="44"
+                                        Height="44"
+                                        Style="{StaticResource BubbleButtonStyle}"
+                                        Command="{Binding ReplayTutorialCommand}"
+                                        Content="&#xE72A;"
+                                        FontFamily="Segoe Fluent Icons"
+                                        FontSize="14" />
+                            </Grid>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>

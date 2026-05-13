@@ -46,6 +46,11 @@ public sealed class TrayIconService : IDisposable
         _notifyIcon.Visible = true;
     }
 
+    public void SetVisible(bool visible)
+    {
+        _notifyIcon.Visible = visible;
+    }
+
     public void EnsureVisible()
     {
         _notifyIcon.Visible = true;

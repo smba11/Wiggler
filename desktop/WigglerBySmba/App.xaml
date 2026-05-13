@@ -11,6 +11,8 @@
         <SolidColorBrush x:Key="AccentMutedBrush" Color="#1A156F67" />
         <SolidColorBrush x:Key="TextBrush" Color="#FF18212B" />
         <SolidColorBrush x:Key="SubtleTextBrush" Color="#FF677381" />
+        <SolidColorBrush x:Key="FrameBrush" Color="#FF26313A" />
+        <SolidColorBrush x:Key="ScreenBrush" Color="#FFCBEFF8" />
         <SolidColorBrush x:Key="SettingsBackgroundBrush" Color="#FFF7F5F0" />
         <SolidColorBrush x:Key="SettingsPanelBrush" Color="#FFFEFCF8" />
         <SolidColorBrush x:Key="ThemeChipBrush" Color="#FFE9F2EF" />

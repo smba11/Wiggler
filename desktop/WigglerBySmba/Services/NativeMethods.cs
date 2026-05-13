@@ -15,6 +15,9 @@ internal static class NativeMethods
     internal const uint MouseeventfMove = 0x0001;
     internal const uint MouseeventfAbsolute = 0x8000;
     internal const uint MouseeventfVirtualdesk = 0x4000;
+    internal const uint EsSystemRequired = 0x00000001;
+    internal const uint EsDisplayRequired = 0x00000002;
+    internal const uint EsContinuous = 0x80000000;
     internal static readonly nuint WigglerExtraInfo = unchecked((nuint)0x534D424157494747UL);
 
     [StructLayout(LayoutKind.Sequential)]
@@ -75,4 +78,7 @@ internal static class NativeMethods
 
     [DllImport("user32.dll", SetLastError = true)]
     internal static extern bool SetCursorPos(int x, int y);
+
+    [DllImport("kernel32.dll")]
+    internal static extern uint SetThreadExecutionState(uint esFlags);
 }

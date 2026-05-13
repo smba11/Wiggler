@@ -1,13 +1,21 @@
+using System.Diagnostics;
+using System.Windows;
 using System.Windows.Media;
+using Microsoft.Win32;
 using WigglerBySmba.Models;
 using WigglerBySmba.Services;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
+using AppThemeMode = WigglerBySmba.Models.ThemeMode;
+using AppThemeVibe = WigglerBySmba.Models.ThemeVibe;
 
 namespace WigglerBySmba.ViewModels;
 
 public sealed class MainViewModel : ObservableObject, IDisposable
 {
+    private const string StartupRunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
+    private const string StartupValueName = "WIGGLER by SMBA";
+
     private readonly AppSettings _settings;
     private readonly SettingsService _settingsService;
     private readonly MouseHookService _mouseHookService;
@@ -21,13 +29,21 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private DateTime _lastUserActivityUtc = DateTime.UtcNow;
     private LaunchMode _selectedLaunchMode;
     private CloseBehavior _selectedCloseBehavior;
+    private ActivationMode _selectedActivationMode;
     private MovementPattern _selectedPattern;
-    private ThemeMode _selectedThemeMode;
-    private ThemeVibe _selectedThemeVibe;
+    private AppThemeMode _selectedThemeMode;
+    private AppThemeVibe _selectedThemeVibe;
     private string _selectedLanguageCode;
     private int _idleDelaySeconds;
     private double _speed;
     private double _size;
+    private bool _startOnWindowsStartup;
+    private bool _rememberLastState;
+    private bool _stopOnMouseMovement;
+    private TakeoverSensitivity _selectedTakeoverSensitivity;
+    private bool _compactMode;
+    private bool _showTrayIcon;
+    private bool _keepRunningInBackground;
 
     public MainViewModel(
         AppSettings settings,
@@ -43,6 +59,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
         _selectedLaunchMode = settings.LaunchMode;
         _selectedCloseBehavior = settings.CloseBehavior;
+        _selectedActivationMode = settings.ActivationMode;
         _selectedPattern = settings.Pattern;
         _selectedThemeMode = settings.ThemeMode;
         _selectedThemeVibe = settings.ThemeVibe;
@@ -50,10 +67,19 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _idleDelaySeconds = settings.IdleDelaySeconds;
         _speed = settings.Speed;
         _size = settings.Size;
+        _startOnWindowsStartup = settings.StartOnWindowsStartup;
+        _rememberLastState = settings.RememberLastState;
+        _stopOnMouseMovement = settings.StopOnMouseMovement;
+        _selectedTakeoverSensitivity = settings.TakeoverSensitivity;
+        _compactMode = settings.CompactMode;
+        _showTrayIcon = settings.ShowTrayIcon;
+        _keepRunningInBackground = settings.KeepRunningInBackground;
 
         TogglePowerCommand = new RelayCommand(TogglePower);
         ToggleSettingsCommand = new RelayCommand(() => IsSettingsOpen = !IsSettingsOpen);
         ReplayTutorialCommand = new RelayCommand(() => RequestTutorial?.Invoke(this, EventArgs.Empty));
+        ResetSettingsCommand = new RelayCommand(ResetSettings);
+        AboutCommand = new RelayCommand(ShowAbout);
 
         _mouseHookService.UserMouseActivity += OnUserMouseActivity;
 
@@ -73,6 +99,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public RelayCommand TogglePowerCommand { get; }
     public RelayCommand ToggleSettingsCommand { get; }
     public RelayCommand ReplayTutorialCommand { get; }
+    public RelayCommand ResetSettingsCommand { get; }
+    public RelayCommand AboutCommand { get; }
 
     public IReadOnlyList<UiOption<LaunchMode>> LaunchModeItems =>
         Enum.GetValues<LaunchMode>().Select(value => new UiOption<LaunchMode>(value, LocalizeLaunchMode(value))).ToList();
@@ -80,29 +108,27 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     public IReadOnlyList<UiOption<CloseBehavior>> CloseBehaviorItems =>
         Enum.GetValues<CloseBehavior>().Select(value => new UiOption<CloseBehavior>(value, LocalizeCloseBehavior(value))).ToList();
 
+    public IReadOnlyList<UiOption<ActivationMode>> ActivationModeItems =>
+        Enum.GetValues<ActivationMode>().Select(value => new UiOption<ActivationMode>(value, LocalizeActivationMode(value))).ToList();
+
     public IReadOnlyList<UiOption<MovementPattern>> PatternItems =>
         Enum.GetValues<MovementPattern>().Select(value => new UiOption<MovementPattern>(value, LocalizePattern(value))).ToList();
 
-    public IReadOnlyList<UiOption<ThemeMode>> ThemeModeItems =>
-        Enum.GetValues<ThemeMode>().Select(value => new UiOption<ThemeMode>(value, LocalizeThemeMode(value))).ToList();
+    public IReadOnlyList<UiOption<TakeoverSensitivity>> TakeoverSensitivityItems =>
+        Enum.GetValues<TakeoverSensitivity>().Select(value => new UiOption<TakeoverSensitivity>(value, LocalizeTakeoverSensitivity(value))).ToList();
 
-    public IReadOnlyList<UiOption<ThemeVibe>> ThemeVibeItems =>
-        Enum.GetValues<ThemeVibe>().Select(value => new UiOption<ThemeVibe>(value, LocalizeThemeVibe(value))).ToList();
+    public IReadOnlyList<UiOption<AppThemeMode>> ThemeModeItems =>
+        Enum.GetValues<AppThemeMode>().Select(value => new UiOption<AppThemeMode>(value, LocalizeThemeMode(value))).ToList();
+
+    public IReadOnlyList<UiOption<AppThemeVibe>> AccentColorItems =>
+        Enum.GetValues<AppThemeVibe>().Select(value => new UiOption<AppThemeVibe>(value, LocalizeThemeVibe(value))).ToList();
 
     public IReadOnlyList<UiOption<string>> LanguageItems => _localizationService.GetLanguageOptions();
 
     public bool IsSettingsOpen
     {
         get => _isSettingsOpen;
-        set
-        {
-            if (!SetProperty(ref _isSettingsOpen, value))
-            {
-                return;
-            }
-
-            OnPropertyChanged(nameof(SettingsButtonLabel));
-        }
+        set => SetProperty(ref _isSettingsOpen, value);
     }
 
     public WigglerStatus Status
@@ -117,20 +143,92 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
             OnPropertyChanged(nameof(StatusLabel));
             OnPropertyChanged(nameof(HeroLabel));
-            OnPropertyChanged(nameof(BehaviorSummary));
             OnPropertyChanged(nameof(StatusDetail));
-            OnPropertyChanged(nameof(ToggleButtonLabel));
+            OnPropertyChanged(nameof(StatusDotBrush));
             OnPropertyChanged(nameof(ToggleStateWord));
-            OnPropertyChanged(nameof(IsPoweredOn));
             OnPropertyChanged(nameof(ToggleTrackBrush));
             OnPropertyChanged(nameof(ToggleTrackBorderBrush));
-            OnPropertyChanged(nameof(ToggleButtonBrush));
-            OnPropertyChanged(nameof(StatusChipBrush));
-            OnPropertyChanged(nameof(StatusChipTextBrush));
-            OnPropertyChanged(nameof(StatusDotBrush));
             StatusChanged?.Invoke(this, value);
         }
     }
+
+    public string BrandTitle => "WIGGLER";
+    public string BrandSubtitle => "by smba";
+    public string StatusLabel => Status switch
+    {
+        WigglerStatus.Off => Text.OffStatus,
+        WigglerStatus.Armed => "Armed",
+        WigglerStatus.Running => Text.RunningStatus,
+        _ => Text.ReadyStatus
+    };
+
+    public string HeroLabel => Status switch
+    {
+        WigglerStatus.Off => Text.HeroOffLabel,
+        WigglerStatus.Armed => Text.HeroReadyLabel,
+        WigglerStatus.Running => Text.HeroRunningLabel,
+        _ => Text.HeroReadyLabel
+    };
+
+    public string StatusDetail => Status switch
+    {
+        WigglerStatus.Off => Text.StatusOffDetail,
+        WigglerStatus.Armed => SelectedActivationMode == ActivationMode.Immediate
+            ? "Movement starts the moment you switch it on."
+            : string.Format(Text.StatusReadyDetail, IdleDelayDisplay.ToLowerInvariant()),
+        WigglerStatus.Running => string.Format(Text.StatusRunningDetail, LocalizedSelectedPattern),
+        _ => string.Empty
+    };
+
+    public string ToggleStateWord => _isEnabled ? "ON" : "OFF";
+    public bool IsPoweredOn => _isEnabled;
+    public Brush ToggleTrackBrush => _isEnabled
+        ? new SolidColorBrush(Color.FromRgb(18, 56, 51))
+        : new SolidColorBrush(Color.FromRgb(31, 36, 44));
+    public Brush ToggleTrackBorderBrush => _isEnabled
+        ? new SolidColorBrush(Color.FromRgb(27, 199, 165))
+        : new SolidColorBrush(Color.FromRgb(58, 67, 78));
+    public Brush StatusDotBrush => Status switch
+    {
+        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(137, 148, 166)),
+        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(27, 199, 165)),
+        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(27, 199, 165)),
+        _ => new SolidColorBrush(Color.FromRgb(137, 148, 166))
+    };
+
+    public string LocalizedSelectedPattern => LocalizePattern(SelectedPattern);
+    public string SpeedDisplay => $"{Speed:0.0}x";
+    public string SizeDisplay => $"{Size:0}px";
+    public string IdleDelayDisplay => $"{IdleDelaySeconds} sec";
+
+    public string LaunchModeLabel => "Launch Mode";
+    public string CloseBehaviorLabel => "Close Behavior";
+    public string StartupLabel => "Start on Windows Startup";
+    public string RememberStateLabel => "Remember Last State";
+    public string PatternLabel => Text.PatternLabel;
+    public string MovementSpeedLabel => "Movement Speed";
+    public string MovementSizeLabel => "Movement Size";
+    public string ActivationModeLabel => "Activation Mode";
+    public string IdleDelayLabel => "Idle Delay";
+    public string StopOnMovementLabel => "Stop on Mouse Movement";
+    public string TakeoverSensitivityLabel => "Takeover Sensitivity";
+    public string ThemeLabel => Text.ThemeLabel;
+    public string AccentColorLabel => "Accent Color";
+    public string CompactModeLabel => "Compact Mode";
+    public string LanguageLabel => Text.LanguageLabel;
+    public string ShowTrayIconLabel => "Show Tray Icon";
+    public string KeepBackgroundLabel => "Keep Running in Background";
+    public string ResetSettingsLabel => "Reset Settings";
+    public string BehaviorSectionLabel => "Behavior";
+    public string MovementSectionLabel => "Movement";
+    public string IdleSectionLabel => "Idle";
+    public string AppearanceSectionLabel => "Appearance";
+    public string HelpSectionLabel => "Help";
+    public string ReplayTutorialLabel => "Replay tutorial";
+    public string AboutLabel => "Open WIGGLER website";
+
+    public string FooterHint =>
+        "WIGGLER runs quietly in the background and gives control back the second you move the mouse.";
 
     public string SelectedLanguageCode
     {
@@ -148,150 +246,6 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             LanguageChanged?.Invoke(this, EventArgs.Empty);
         }
     }
-
-    public string StatusLabel => Status switch
-    {
-        WigglerStatus.Off => Text.OffStatus,
-        WigglerStatus.Armed => Text.ReadyStatus,
-        WigglerStatus.Running => Text.RunningStatus,
-        _ => Text.ReadyStatus
-    };
-
-    public string HeroLabel => Status switch
-    {
-        WigglerStatus.Off => Text.HeroOffLabel,
-        WigglerStatus.Armed => Text.HeroReadyLabel,
-        WigglerStatus.Running => Text.HeroRunningLabel,
-        _ => Text.HeroReadyLabel
-    };
-
-    public string BehaviorSummary => Status switch
-    {
-        WigglerStatus.Off => Text.BehaviorOffSummary,
-        WigglerStatus.Armed => string.Format(Text.BehaviorReadySummary, IdleDelayDisplay.ToLowerInvariant()),
-        WigglerStatus.Running => Text.BehaviorRunningSummary,
-        _ => string.Empty
-    };
-
-    public string PatternSummary =>
-        $"{LocalizedSelectedPattern} {Text.PatternLabel.ToLowerInvariant()}, {SpeedDisplay.ToLowerInvariant()}, {SizeDisplay.ToLowerInvariant()}";
-
-    public string StatusDetail => Status switch
-    {
-        WigglerStatus.Off => Text.StatusOffDetail,
-        WigglerStatus.Armed => string.Format(Text.StatusReadyDetail, IdleDelayDisplay.ToLowerInvariant()),
-        WigglerStatus.Running => string.Format(Text.StatusRunningDetail, LocalizedSelectedPattern),
-        _ => string.Empty
-    };
-
-    public string ToggleButtonLabel => _isEnabled ? Text.ToggleOffLabel : Text.ToggleOnLabel;
-    public string ToggleStateWord => _isEnabled ? "ON" : "OFF";
-    public bool IsPoweredOn => _isEnabled;
-    public Brush ToggleTrackBrush => _isEnabled
-        ? new SolidColorBrush(Color.FromRgb(18, 46, 44))
-        : new SolidColorBrush(Color.FromRgb(29, 34, 41));
-    public Brush ToggleTrackBorderBrush => _isEnabled
-        ? new SolidColorBrush(Color.FromRgb(27, 199, 165))
-        : new SolidColorBrush(Color.FromRgb(57, 66, 77));
-
-    public Brush ToggleButtonBrush => _isEnabled
-        ? new SolidColorBrush(Color.FromRgb(153, 27, 27))
-        : new SolidColorBrush(Color.FromRgb(15, 118, 110));
-
-    public Brush StatusChipBrush => Status switch
-    {
-        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(238, 242, 247)),
-        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(232, 244, 241)),
-        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(255, 241, 234)),
-        _ => new SolidColorBrush(Color.FromRgb(238, 242, 247))
-    };
-
-    public Brush StatusChipTextBrush => Status switch
-    {
-        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(71, 85, 105)),
-        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(15, 118, 110)),
-        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(180, 83, 9)),
-        _ => new SolidColorBrush(Color.FromRgb(71, 85, 105))
-    };
-
-    public Brush StatusDotBrush => Status switch
-    {
-        WigglerStatus.Off => new SolidColorBrush(Color.FromRgb(148, 163, 184)),
-        WigglerStatus.Armed => new SolidColorBrush(Color.FromRgb(20, 184, 166)),
-        WigglerStatus.Running => new SolidColorBrush(Color.FromRgb(245, 158, 11)),
-        _ => new SolidColorBrush(Color.FromRgb(148, 163, 184))
-    };
-
-    public string SettingsButtonLabel => IsSettingsOpen ? Text.HideSettingsLabel : Text.OpenSettingsLabel;
-    public string LocalizedSelectedPattern => LocalizePattern(SelectedPattern);
-    public string SpeedDisplay => $"{Speed:0.0}x";
-    public string SizeDisplay => $"{Size:0}px";
-    public string IdleDelayDisplay => $"{IdleDelaySeconds} sec";
-
-    public string BrandTitle => Text.BrandTitle;
-    public string BrandSubtitle => Text.BrandSubtitle;
-    public string StatusTitle => Text.StatusTitle;
-    public string HeroEyebrow => Text.HeroEyebrow;
-    public string NowTunedForLabel => Text.NowTunedForLabel;
-    public string HeroCardDetail => Text.HeroCardDetail;
-    public string BehaviorTitle => Text.BehaviorTitle;
-    public string IdleDelayCardTitle => Text.IdleDelayCardTitle;
-    public string PatternCardTitle => Text.PatternCardTitle;
-    public string TakeoverTitle => Text.TakeoverTitle;
-    public string TakeoverValue => Text.TakeoverValue;
-    public string HowItFeelsTitle => Text.HowItFeelsTitle;
-    public string HowItFeelsBody => Text.HowItFeelsBody;
-    public string ReplayTutorialLabel => Text.ReplayTutorialLabel;
-    public string TrayReadyTitle => Text.TrayReadyTitle;
-    public string TrayReadyBody => Text.TrayReadyBody;
-    public string SettingsHeaderTitle => Text.SettingsHeaderTitle;
-    public string SettingsSubtitle => Text.SettingsSubtitle;
-    public string LookSectionTitle => Text.LookSectionTitle;
-    public string BehaviorSectionTitle => Text.BehaviorSectionTitle;
-    public string MovementSectionTitle => Text.MovementSectionTitle;
-    public string AppearanceSectionTitle => SelectedLanguageCode switch
-    {
-        "es" => "Apariencia",
-        "pt" => "Aparencia",
-        "fr" => "Apparence",
-        "de" => "Darstellung",
-        "it" => "Aspetto",
-        "nl" => "Uiterlijk",
-        "sv" => "Utseende",
-        "ja" => "外観",
-        "ko" => "모양",
-        "zh" => "外观",
-        "ar" => "المظهر",
-        "hi" => "दिखावट",
-        _ => "Appearance"
-    };
-    public string HelpSectionTitle => SelectedLanguageCode switch
-    {
-        "es" => "Ayuda",
-        "pt" => "Ajuda",
-        "fr" => "Aide",
-        "de" => "Hilfe",
-        "it" => "Aiuto",
-        "nl" => "Help",
-        "sv" => "Hjalp",
-        "ja" => "ヘルプ",
-        "ko" => "도움말",
-        "zh" => "帮助",
-        "ar" => "مساعدة",
-        "hi" => "मदद",
-        _ => "Help"
-    };
-    public string ThemeLabel => Text.ThemeLabel;
-    public string LanguageLabel => Text.LanguageLabel;
-    public string ModeLabel => Text.ModeLabel;
-    public string ColorVibeLabel => Text.ColorVibeLabel;
-    public string LaunchInLabel => Text.LaunchInLabel;
-    public string CloseBehaviorLabel => Text.CloseBehaviorLabel;
-    public string IdleDelayLabel => Text.IdleDelayLabel;
-    public string PatternLabel => Text.PatternLabel;
-    public string SpeedLabel => Text.SpeedLabel;
-    public string SizeLabel => Text.SizeLabel;
-    public string ReadyCardValue => Text.ReadyCardValue;
 
     public LaunchMode SelectedLaunchMode
     {
@@ -323,58 +277,55 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         }
     }
 
-    public ThemeMode SelectedThemeMode
+    public bool StartOnWindowsStartup
     {
-        get => _selectedThemeMode;
+        get => _startOnWindowsStartup;
         set
         {
-            if (!SetProperty(ref _selectedThemeMode, value))
+            if (!SetProperty(ref _startOnWindowsStartup, value))
             {
                 return;
             }
 
-            _settings.ThemeMode = value;
+            _settings.StartOnWindowsStartup = value;
+            ApplyStartupSetting(value);
             PersistSettings();
-            ThemeChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    public ThemeVibe SelectedThemeVibe
+    public bool RememberLastState
     {
-        get => _selectedThemeVibe;
+        get => _rememberLastState;
         set
         {
-            if (!SetProperty(ref _selectedThemeVibe, value))
+            if (!SetProperty(ref _rememberLastState, value))
             {
                 return;
             }
 
-            _settings.ThemeVibe = value;
+            _settings.RememberLastState = value;
+            if (!value)
+            {
+                _settings.LastEnabledState = false;
+            }
+
             PersistSettings();
-            ThemeChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 
-    public MovementPattern SelectedPattern
+    public ActivationMode SelectedActivationMode
     {
-        get => _selectedPattern;
+        get => _selectedActivationMode;
         set
         {
-            if (!SetProperty(ref _selectedPattern, value))
+            if (!SetProperty(ref _selectedActivationMode, value))
             {
                 return;
             }
 
-            _settings.Pattern = value;
-            OnPropertyChanged(nameof(PatternSummary));
+            _settings.ActivationMode = value;
+            PersistSettings();
             OnPropertyChanged(nameof(StatusDetail));
-            OnPropertyChanged(nameof(LocalizedSelectedPattern));
-            PersistSettings();
-
-            if (Status == WigglerStatus.Running)
-            {
-                RestartMovement();
-            }
         }
     }
 
@@ -389,10 +340,31 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
 
             _settings.IdleDelaySeconds = value;
-            OnPropertyChanged(nameof(IdleDelayDisplay));
-            OnPropertyChanged(nameof(BehaviorSummary));
-            OnPropertyChanged(nameof(StatusDetail));
             PersistSettings();
+            OnPropertyChanged(nameof(IdleDelayDisplay));
+            OnPropertyChanged(nameof(StatusDetail));
+        }
+    }
+
+    public MovementPattern SelectedPattern
+    {
+        get => _selectedPattern;
+        set
+        {
+            if (!SetProperty(ref _selectedPattern, value))
+            {
+                return;
+            }
+
+            _settings.Pattern = value;
+            PersistSettings();
+            OnPropertyChanged(nameof(LocalizedSelectedPattern));
+            OnPropertyChanged(nameof(StatusDetail));
+
+            if (Status == WigglerStatus.Running)
+            {
+                RestartMovement();
+            }
         }
     }
 
@@ -407,9 +379,8 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
 
             _settings.Speed = value;
-            OnPropertyChanged(nameof(SpeedDisplay));
-            OnPropertyChanged(nameof(PatternSummary));
             PersistSettings();
+            OnPropertyChanged(nameof(SpeedDisplay));
 
             if (Status == WigglerStatus.Running)
             {
@@ -429,14 +400,120 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             }
 
             _settings.Size = value;
-            OnPropertyChanged(nameof(SizeDisplay));
-            OnPropertyChanged(nameof(PatternSummary));
             PersistSettings();
+            OnPropertyChanged(nameof(SizeDisplay));
 
             if (Status == WigglerStatus.Running)
             {
                 RestartMovement();
             }
+        }
+    }
+
+    public bool StopOnMouseMovement
+    {
+        get => _stopOnMouseMovement;
+        set
+        {
+            if (!SetProperty(ref _stopOnMouseMovement, value))
+            {
+                return;
+            }
+
+            _settings.StopOnMouseMovement = value;
+            PersistSettings();
+        }
+    }
+
+    public TakeoverSensitivity SelectedTakeoverSensitivity
+    {
+        get => _selectedTakeoverSensitivity;
+        set
+        {
+            if (!SetProperty(ref _selectedTakeoverSensitivity, value))
+            {
+                return;
+            }
+
+            _settings.TakeoverSensitivity = value;
+            PersistSettings();
+        }
+    }
+
+    public AppThemeMode SelectedThemeMode
+    {
+        get => _selectedThemeMode;
+        set
+        {
+            if (!SetProperty(ref _selectedThemeMode, value))
+            {
+                return;
+            }
+
+            _settings.ThemeMode = value;
+            PersistSettings();
+            ThemeChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public AppThemeVibe SelectedThemeVibe
+    {
+        get => _selectedThemeVibe;
+        set
+        {
+            if (!SetProperty(ref _selectedThemeVibe, value))
+            {
+                return;
+            }
+
+            _settings.ThemeVibe = value;
+            PersistSettings();
+            ThemeChanged?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    public bool CompactMode
+    {
+        get => _compactMode;
+        set
+        {
+            if (!SetProperty(ref _compactMode, value))
+            {
+                return;
+            }
+
+            _settings.CompactMode = value;
+            PersistSettings();
+        }
+    }
+
+    public bool ShowTrayIcon
+    {
+        get => _showTrayIcon;
+        set
+        {
+            if (!SetProperty(ref _showTrayIcon, value))
+            {
+                return;
+            }
+
+            _settings.ShowTrayIcon = value;
+            PersistSettings();
+        }
+    }
+
+    public bool KeepRunningInBackground
+    {
+        get => _keepRunningInBackground;
+        set
+        {
+            if (!SetProperty(ref _keepRunningInBackground, value))
+            {
+                return;
+            }
+
+            _settings.KeepRunningInBackground = value;
+            PersistSettings();
         }
     }
 
@@ -450,7 +527,26 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             return;
         }
 
-        IsSettingsOpen = true;
+        IsSettingsOpen = false;
+
+        if (_settings.RememberLastState && _settings.LastEnabledState)
+        {
+            _isEnabled = true;
+            _lastUserActivityUtc = DateTime.UtcNow;
+            ApplyExecutionState();
+            if (SelectedActivationMode == ActivationMode.Immediate)
+            {
+                StartMovementNow();
+            }
+            else
+            {
+                Status = WigglerStatus.Armed;
+            }
+            OnPropertyChanged(nameof(ToggleStateWord));
+            OnPropertyChanged(nameof(IsPoweredOn));
+            OnPropertyChanged(nameof(ToggleTrackBrush));
+            OnPropertyChanged(nameof(ToggleTrackBorderBrush));
+        }
     }
 
     public void CompleteOnboarding()
@@ -462,7 +558,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
         _settings.HasCompletedOnboarding = true;
         PersistSettings();
-        IsSettingsOpen = true;
+        IsSettingsOpen = false;
     }
 
     public IReadOnlyList<AppLocalizationService.TutorialPageText> GetTutorialPages() =>
@@ -473,22 +569,39 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     private void TogglePower()
     {
         _isEnabled = !_isEnabled;
+        _settings.LastEnabledState = RememberLastState && _isEnabled;
+
         if (_isEnabled)
         {
             _lastUserActivityUtc = DateTime.UtcNow;
-            Status = WigglerStatus.Armed;
+            ApplyExecutionState();
+            if (SelectedActivationMode == ActivationMode.Immediate)
+            {
+                StartMovementNow();
+            }
+            else
+            {
+                Status = WigglerStatus.Armed;
+            }
         }
         else
         {
             StopMovement();
+            ReleaseExecutionState();
             Status = WigglerStatus.Off;
         }
+
+        PersistSettings();
+        OnPropertyChanged(nameof(ToggleStateWord));
+        OnPropertyChanged(nameof(IsPoweredOn));
+        OnPropertyChanged(nameof(ToggleTrackBrush));
+        OnPropertyChanged(nameof(ToggleTrackBorderBrush));
     }
 
     private void OnUserMouseActivity(object? sender, EventArgs e)
     {
         _lastUserActivityUtc = DateTime.UtcNow;
-        if (_isEnabled && Status == WigglerStatus.Running)
+        if (_isEnabled && StopOnMouseMovement && Status == WigglerStatus.Running)
         {
             StopMovement();
             Status = WigglerStatus.Armed;
@@ -497,16 +610,21 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private void OnIdleTick(object? sender, EventArgs e)
     {
-        if (!_isEnabled)
+        if (!_isEnabled || SelectedActivationMode == ActivationMode.Immediate)
         {
             return;
         }
 
         if (Status == WigglerStatus.Armed && DateTime.UtcNow - _lastUserActivityUtc >= TimeSpan.FromSeconds(IdleDelaySeconds))
         {
-            _mouseMovementService.Start(SelectedPattern, Speed, Size);
-            Status = WigglerStatus.Running;
+            StartMovementNow();
         }
+    }
+
+    private void StartMovementNow()
+    {
+        _mouseMovementService.Start(SelectedPattern, Speed, Size);
+        Status = WigglerStatus.Running;
     }
 
     private void RestartMovement()
@@ -520,6 +638,100 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         if (_mouseMovementService.IsRunning)
         {
             _mouseMovementService.Stop();
+        }
+    }
+
+    private void ResetSettings()
+    {
+        var reset = new AppSettings
+        {
+            HasCompletedOnboarding = _settings.HasCompletedOnboarding
+        };
+
+        _settings.LanguageCode = reset.LanguageCode;
+        _settings.LaunchMode = reset.LaunchMode;
+        _settings.CloseBehavior = reset.CloseBehavior;
+        _settings.StartOnWindowsStartup = reset.StartOnWindowsStartup;
+        _settings.RememberLastState = reset.RememberLastState;
+        _settings.LastEnabledState = false;
+        _settings.IdleDelaySeconds = reset.IdleDelaySeconds;
+        _settings.ActivationMode = reset.ActivationMode;
+        _settings.Pattern = reset.Pattern;
+        _settings.Speed = reset.Speed;
+        _settings.Size = reset.Size;
+        _settings.StopOnMouseMovement = reset.StopOnMouseMovement;
+        _settings.TakeoverSensitivity = reset.TakeoverSensitivity;
+        _settings.ThemeMode = reset.ThemeMode;
+        _settings.ThemeVibe = reset.ThemeVibe;
+        _settings.CompactMode = reset.CompactMode;
+        _settings.ShowTrayIcon = reset.ShowTrayIcon;
+        _settings.KeepRunningInBackground = reset.KeepRunningInBackground;
+
+        _selectedLanguageCode = _settings.LanguageCode;
+        _selectedLaunchMode = _settings.LaunchMode;
+        _selectedCloseBehavior = _settings.CloseBehavior;
+        _startOnWindowsStartup = _settings.StartOnWindowsStartup;
+        _rememberLastState = _settings.RememberLastState;
+        _idleDelaySeconds = _settings.IdleDelaySeconds;
+        _selectedActivationMode = _settings.ActivationMode;
+        _selectedPattern = _settings.Pattern;
+        _speed = _settings.Speed;
+        _size = _settings.Size;
+        _stopOnMouseMovement = _settings.StopOnMouseMovement;
+        _selectedTakeoverSensitivity = _settings.TakeoverSensitivity;
+        _selectedThemeMode = _settings.ThemeMode;
+        _selectedThemeVibe = _settings.ThemeVibe;
+        _compactMode = _settings.CompactMode;
+        _showTrayIcon = _settings.ShowTrayIcon;
+        _keepRunningInBackground = _settings.KeepRunningInBackground;
+
+        ApplyStartupSetting(false);
+        PersistSettings();
+        RefreshLocalizedProperties();
+        ThemeChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    private void ShowAbout()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = "https://smba11.github.io/Wiggler/",
+                UseShellExecute = true
+            });
+        }
+        catch
+        {
+            // Best effort only.
+        }
+    }
+
+    private void ApplyStartupSetting(bool enabled)
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(StartupRunKey, true) ?? Registry.CurrentUser.CreateSubKey(StartupRunKey);
+            if (key is null)
+            {
+                return;
+            }
+
+            if (!enabled)
+            {
+                key.DeleteValue(StartupValueName, false);
+                return;
+            }
+
+            var executablePath = Process.GetCurrentProcess().MainModule?.FileName;
+            if (!string.IsNullOrWhiteSpace(executablePath))
+            {
+                key.SetValue(StartupValueName, $"\"{executablePath}\"");
+            }
+        }
+        catch
+        {
+            // Best effort only; failing here should not break the app.
         }
     }
 
@@ -593,9 +805,24 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _ => value.ToString()
     };
 
-    private string LocalizeThemeMode(ThemeMode value) => value switch
+    private string LocalizeActivationMode(ActivationMode value) => value switch
     {
-        ThemeMode.Light => SelectedLanguageCode switch
+        ActivationMode.AfterIdle => "After idle",
+        ActivationMode.Immediate => "Immediate",
+        _ => value.ToString()
+    };
+
+    private string LocalizeTakeoverSensitivity(TakeoverSensitivity value) => value switch
+    {
+        TakeoverSensitivity.Low => "Low",
+        TakeoverSensitivity.Normal => "Normal",
+        TakeoverSensitivity.High => "High",
+        _ => value.ToString()
+    };
+
+    private string LocalizeThemeMode(AppThemeMode value) => value switch
+    {
+        AppThemeMode.Light => SelectedLanguageCode switch
         {
             "es" => "Claro",
             "pt" => "Claro",
@@ -611,7 +838,7 @@ public sealed class MainViewModel : ObservableObject, IDisposable
             "hi" => "लाइट",
             _ => "Light"
         },
-        ThemeMode.Dark => SelectedLanguageCode switch
+        AppThemeMode.Dark => SelectedLanguageCode switch
         {
             "es" => "Oscuro",
             "pt" => "Escuro",
@@ -630,72 +857,12 @@ public sealed class MainViewModel : ObservableObject, IDisposable
         _ => value.ToString()
     };
 
-    private string LocalizeThemeVibe(ThemeVibe value) => value switch
+    private string LocalizeThemeVibe(AppThemeVibe value) => value switch
     {
-        ThemeVibe.Tide => SelectedLanguageCode switch
-        {
-            "es" => "Marea",
-            "pt" => "Maré",
-            "fr" => "Marée",
-            "de" => "Tide",
-            "it" => "Marea",
-            "nl" => "Getij",
-            "sv" => "Tidvatten",
-            "ja" => "タイド",
-            "ko" => "타이드",
-            "zh" => "潮汐",
-            "ar" => "مد",
-            "hi" => "टाइड",
-            _ => "Tide"
-        },
-        ThemeVibe.Ember => SelectedLanguageCode switch
-        {
-            "es" => "Brasa",
-            "pt" => "Brasa",
-            "fr" => "Braise",
-            "de" => "Glut",
-            "it" => "Brace",
-            "nl" => "Gloed",
-            "sv" => "Glöd",
-            "ja" => "エンバー",
-            "ko" => "엠버",
-            "zh" => "余烬",
-            "ar" => "جمر",
-            "hi" => "एम्बर",
-            _ => "Ember"
-        },
-        ThemeVibe.Citrus => SelectedLanguageCode switch
-        {
-            "es" => "Cítrico",
-            "pt" => "Cítrico",
-            "fr" => "Agrume",
-            "de" => "Zitrus",
-            "it" => "Agrumi",
-            "nl" => "Citrus",
-            "sv" => "Citrus",
-            "ja" => "シトラス",
-            "ko" => "시트러스",
-            "zh" => "柑橘",
-            "ar" => "حمضيات",
-            "hi" => "सिट्रस",
-            _ => "Citrus"
-        },
-        ThemeVibe.Bloom => SelectedLanguageCode switch
-        {
-            "es" => "Bloom",
-            "pt" => "Bloom",
-            "fr" => "Bloom",
-            "de" => "Bloom",
-            "it" => "Bloom",
-            "nl" => "Bloom",
-            "sv" => "Bloom",
-            "ja" => "ブルーム",
-            "ko" => "블룸",
-            "zh" => "绽放",
-            "ar" => "ازدهار",
-            "hi" => "ब्लूम",
-            _ => "Bloom"
-        },
+        AppThemeVibe.Tide => "Tide",
+        AppThemeVibe.Ember => "Ember",
+        AppThemeVibe.Citrus => "Citrus",
+        AppThemeVibe.Bloom => "Bloom",
         _ => value.ToString()
     };
 
@@ -703,17 +870,10 @@ public sealed class MainViewModel : ObservableObject, IDisposable
     {
         foreach (var property in new[]
         {
-            nameof(StatusLabel), nameof(HeroLabel), nameof(BehaviorSummary), nameof(StatusDetail), nameof(ToggleButtonLabel),
-            nameof(SettingsButtonLabel), nameof(LocalizedSelectedPattern), nameof(PatternSummary), nameof(BrandTitle), nameof(BrandSubtitle),
-            nameof(StatusTitle), nameof(HeroEyebrow), nameof(NowTunedForLabel), nameof(HeroCardDetail), nameof(BehaviorTitle),
-            nameof(IdleDelayCardTitle), nameof(PatternCardTitle), nameof(TakeoverTitle), nameof(TakeoverValue), nameof(HowItFeelsTitle),
-            nameof(HowItFeelsBody), nameof(ReplayTutorialLabel), nameof(TrayReadyTitle), nameof(TrayReadyBody), nameof(SettingsHeaderTitle),
-            nameof(SettingsSubtitle), nameof(LookSectionTitle), nameof(BehaviorSectionTitle), nameof(MovementSectionTitle),
-            nameof(AppearanceSectionTitle), nameof(HelpSectionTitle),
-            nameof(ThemeLabel), nameof(LanguageLabel), nameof(ModeLabel), nameof(ColorVibeLabel), nameof(LaunchInLabel),
-            nameof(CloseBehaviorLabel), nameof(IdleDelayLabel), nameof(PatternLabel), nameof(SpeedLabel), nameof(SizeLabel),
-            nameof(ReadyCardValue), nameof(StatusChipBrush), nameof(StatusChipTextBrush), nameof(ThemeModeItems), nameof(ThemeVibeItems), nameof(LaunchModeItems),
-            nameof(CloseBehaviorItems), nameof(PatternItems), nameof(LanguageItems)
+            nameof(StatusLabel), nameof(HeroLabel), nameof(StatusDetail), nameof(LocalizedSelectedPattern),
+            nameof(PatternLabel), nameof(ThemeLabel), nameof(LanguageLabel),
+            nameof(LaunchModeItems), nameof(CloseBehaviorItems), nameof(ActivationModeItems), nameof(PatternItems),
+            nameof(TakeoverSensitivityItems), nameof(ThemeModeItems), nameof(AccentColorItems), nameof(LanguageItems)
         })
         {
             OnPropertyChanged(property);
@@ -722,8 +882,22 @@ public sealed class MainViewModel : ObservableObject, IDisposable
 
     private void PersistSettings() => _settingsService.Save(_settings);
 
+    private static void ApplyExecutionState()
+    {
+        NativeMethods.SetThreadExecutionState(
+            NativeMethods.EsContinuous |
+            NativeMethods.EsDisplayRequired |
+            NativeMethods.EsSystemRequired);
+    }
+
+    private static void ReleaseExecutionState()
+    {
+        NativeMethods.SetThreadExecutionState(NativeMethods.EsContinuous);
+    }
+
     public void Dispose()
     {
+        ReleaseExecutionState();
         _idleTimer.Stop();
         _idleTimer.Tick -= OnIdleTick;
         _mouseHookService.UserMouseActivity -= OnUserMouseActivity;
@@ -841,18 +1015,18 @@ internal static class AppTextPackExtensions
             "Circle" => "دائرة",
             "Square" => "مربع",
             "Triangle" => "مثلث",
-            "Figure 8" => "رقم 8",
+            "Figure 8" => "شكل 8",
             "Parallelogram" => "متوازي أضلاع",
             "Random" => "عشوائي",
             _ => pattern
         },
         "हिन्दी" => pattern switch
         {
-            "Circle" => "सर्कल",
-            "Square" => "स्क्वेयर",
-            "Triangle" => "ट्रायंगल",
-            "Figure 8" => "फिगर 8",
-            "Parallelogram" => "पैरललोग्राम",
+            "Circle" => "वृत्त",
+            "Square" => "वर्ग",
+            "Triangle" => "त्रिभुज",
+            "Figure 8" => "आठ आकृति",
+            "Parallelogram" => "समांतर चतुर्भुज",
             "Random" => "रैंडम",
             _ => pattern
         },

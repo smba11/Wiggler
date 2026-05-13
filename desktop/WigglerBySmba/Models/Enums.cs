@@ -29,6 +29,19 @@ public enum CloseBehavior
     Exit
 }
 
+public enum ActivationMode
+{
+    AfterIdle,
+    Immediate
+}
+
+public enum TakeoverSensitivity
+{
+    Low,
+    Normal,
+    High
+}
+
 public enum ThemeMode
 {
     Light,

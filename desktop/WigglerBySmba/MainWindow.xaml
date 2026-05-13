@@ -3,60 +3,58 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
         Title="WIGGLER by SMBA"
-        Width="1040"
-        Height="780"
-        MinWidth="860"
-        MinHeight="640"
+        Width="1180"
+        Height="760"
+        MinWidth="940"
+        MinHeight="620"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="CanResize"
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
-        Background="{DynamicResource WindowBackgroundBrush}">
+        Background="Transparent">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="54"
+                            CornerRadius="0"
+                            GlassFrameThickness="0"
+                            ResizeBorderThickness="7"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
     <Window.Resources>
         <DropShadowEffect x:Key="ShellShadow"
-                          BlurRadius="44"
+                          BlurRadius="26"
                           ShadowDepth="0"
-                          Opacity="0.34"
-                          Color="#C0000000" />
+                          Opacity="0.18"
+                          Color="#D5000000" />
 
-        <LinearGradientBrush x:Key="HeroGlowBrush" StartPoint="0,0" EndPoint="1,1">
-            <GradientStop Color="#2E1BC7A5" Offset="0" />
-            <GradientStop Color="#081BC7A5" Offset="1" />
-        </LinearGradientBrush>
+        <DropShadowEffect x:Key="PanelShadow"
+                          BlurRadius="14"
+                          ShadowDepth="0"
+                          Opacity="0.1"
+                          Color="#A0000000" />
 
-        <Style x:Key="BubbleButtonStyle" TargetType="Button">
-            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="Padding" Value="16,10" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="FontSize" Value="14" />
+        <SolidColorBrush x:Key="HeroGlowBrush" Color="#2627C7A5" />
+        <SolidColorBrush x:Key="ToggleKnobBrush" Color="#FFF7FAFC" />
+
+        <Style x:Key="ScrollThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="IsTabStop" Value="False" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="ButtonBorder"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="18">
-                            <ContentPresenter HorizontalAlignment="Center"
-                                              VerticalAlignment="Center" />
-                        </Border>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="ThumbBorder"
+                                Background="#51616C"
+                                CornerRadius="5" />
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="#648A95" />
                             </Trigger>
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="ButtonBorder" Property="BorderThickness" Value="2" />
-                                <Setter TargetName="ButtonBorder" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="ThumbBorder" Property="Background" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -64,51 +62,238 @@
             </Setter>
         </Style>
 
-        <Style x:Key="IconBubbleButtonStyle" TargetType="Button" BasedOn="{StaticResource BubbleButtonStyle}">
-            <Setter Property="Width" Value="64" />
-            <Setter Property="Height" Value="64" />
-            <Setter Property="Padding" Value="0" />
+        <Style x:Key="ScrollLineButtonStyle" TargetType="RepeatButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
-        <Style x:Key="StatusChipStyle" TargetType="Border">
-            <Setter Property="Padding" Value="20,10" />
-            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Grid Background="Transparent">
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource ScrollLineButtonStyle}" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource ScrollThumbStyle}" />
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource ScrollLineButtonStyle}" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Height" Value="10" />
+                    <Setter Property="Width" Value="Auto" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ScrollViewer">
+            <Setter Property="PanningMode" Value="VerticalOnly" />
+            <Setter Property="CanContentScroll" Value="False" />
+        </Style>
+
+        <Style x:Key="ContentOnlyButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <ContentPresenter />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WindowControlButtonStyle" TargetType="Button" BasedOn="{StaticResource ContentOnlyButtonStyle}">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{DynamicResource SubtleTextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Width="{TemplateBinding Width}"
+                                Height="{TemplateBinding Height}"
+                                Background="#10FFFFFF"
+                                BorderBrush="#18FFFFFF"
+                                BorderThickness="1"
+                                CornerRadius="15">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#18FFFFFF" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#28FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#22FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SidebarIconButtonStyle" TargetType="Button" BasedOn="{StaticResource ContentOnlyButtonStyle}">
+            <Setter Property="Width" Value="42" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="#12FFFFFF"
+                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="14">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#1BFFFFFF" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="#20FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource ContentOnlyButtonStyle}">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
+            <Setter Property="Padding" Value="14,10" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Border"
+                                Background="{DynamicResource SurfaceBrush}"
+                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="14">
+                            <ContentPresenter Margin="{TemplateBinding Padding}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+                                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Border" Property="Background" Value="{DynamicResource AccentMutedBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TopBarStatusStyle" TargetType="Border">
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Background" Value="#10FFFFFF" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
             <Setter Property="BorderThickness" Value="1" />
-            <Setter Property="CornerRadius" Value="24" />
+        </Style>
+
+        <Style x:Key="InfoChipStyle" TargetType="Border">
+            <Setter Property="Padding" Value="12,9" />
+            <Setter Property="CornerRadius" Value="14" />
+            <Setter Property="Background" Value="#11FFFFFF" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="SidebarPanelStyle" TargetType="Border">
+            <Setter Property="Background" Value="#0FFFFFFF" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="22" />
+        </Style>
+
+        <Style x:Key="SectionShellStyle" TargetType="Border">
+            <Setter Property="Padding" Value="16" />
+            <Setter Property="CornerRadius" Value="18" />
+            <Setter Property="Background" Value="#12FFFFFF" />
+            <Setter Property="BorderBrush" Value="#14FFFFFF" />
+            <Setter Property="BorderThickness" Value="1" />
+        </Style>
+
+        <Style x:Key="ComboToggleButtonStyle" TargetType="ToggleButton">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ToggleButton">
+                        <Border Background="{TemplateBinding Background}" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
 
         <Style TargetType="ComboBox">
-            <Setter Property="Height" Value="46" />
-            <Setter Property="MaxDropDownHeight" Value="260" />
+            <Setter Property="Height" Value="42" />
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
+            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
             <Setter Property="BorderBrush" Value="{DynamicResource ThemeChipBorderBrush}" />
-            <Setter Property="FontSize" Value="14" />
-            <Setter Property="Padding" Value="18,0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="Padding" Value="14,0" />
             <Setter Property="ScrollViewer.CanContentScroll" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
-                        <Grid SnapsToDevicePixels="True">
+                        <Grid>
                             <Border x:Name="ComboBorder"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="1"
-                                    CornerRadius="15">
+                                    CornerRadius="14">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="40" />
+                                        <ColumnDefinition Width="38" />
                                     </Grid.ColumnDefinitions>
-                                    <ContentPresenter Margin="18,0,0,0"
+                                    <ContentPresenter Margin="14,0,0,0"
                                                       VerticalAlignment="Center"
                                                       Content="{TemplateBinding SelectionBoxItem}" />
                                     <ToggleButton Grid.ColumnSpan="2"
-                                                  Background="Transparent"
-                                                  BorderThickness="0"
-                                                  Focusable="False"
-                                                  ClickMode="Press"
+                                                  Style="{StaticResource ComboToggleButtonStyle}"
                                                   IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}" />
                                     <Path Grid.Column="1"
                                           Width="10"
@@ -116,45 +301,39 @@
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
                                           Stroke="{DynamicResource SubtleTextBrush}"
-                                          StrokeThickness="1.8"
+                                          StrokeThickness="1.5"
                                           StrokeStartLineCap="Round"
                                           StrokeEndLineCap="Round"
-                                          Data="M 0 0 L 5 5 L 10 0" />
+                                          Data="M 0 0 L 4 4 L 8 0" />
                                 </Grid>
                             </Border>
                             <Popup x:Name="PART_Popup"
                                    AllowsTransparency="True"
-                                   Placement="Bottom"
-                                   PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                                    IsOpen="{TemplateBinding IsDropDownOpen}"
-                                   PopupAnimation="Fade"
-                                   StaysOpen="False">
+                                   Placement="Bottom"
+                                   PopupAnimation="Fade">
                                 <Border Margin="0,8,0,0"
                                         MinWidth="{Binding ActualWidth, RelativeSource={RelativeSource TemplatedParent}}"
                                         Background="{DynamicResource SettingsPanelBrush}"
                                         BorderBrush="{DynamicResource ThemeChipBorderBrush}"
                                         BorderThickness="1"
-                                        CornerRadius="18"
-                                        Effect="{StaticResource ShellShadow}">
+                                        CornerRadius="16"
+                                        Effect="{StaticResource PanelShadow}">
                                     <ScrollViewer Margin="6"
-                                                  CanContentScroll="False"
-                                                  VerticalScrollBarVisibility="Auto">
+                                                  VerticalScrollBarVisibility="Auto"
+                                                  HorizontalScrollBarVisibility="Disabled">
                                         <ItemsPresenter />
                                     </ScrollViewer>
                                 </Border>
                             </Popup>
                         </Grid>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="ComboBorder" Property="BorderThickness" Value="2" />
-                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
                             </Trigger>
                             <Trigger Property="IsDropDownOpen" Value="True">
                                 <Setter TargetName="ComboBorder" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
-                                <Setter TargetName="ComboBorder" Property="BorderThickness" Value="2" />
+                                <Setter TargetName="ComboBorder" Property="Background" Value="{DynamicResource SurfaceMutedBrush}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -164,16 +343,17 @@
 
         <Style TargetType="ComboBoxItem">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
-            <Setter Property="Padding" Value="12,10" />
-            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Height" Value="36" />
+            <Setter Property="Padding" Value="12,8" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBoxItem">
                         <Border x:Name="ItemBorder"
                                 Margin="2"
                                 Background="Transparent"
-                                CornerRadius="12">
-                            <ContentPresenter Margin="12,0"
+                                CornerRadius="10">
+                            <ContentPresenter Margin="10,0"
                                               VerticalAlignment="Center" />
                         </Border>
                         <ControlTemplate.Triggers>
@@ -189,588 +369,681 @@
             </Setter>
         </Style>
 
+        <Style x:Key="SmallToggleStyle" TargetType="CheckBox">
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Grid Width="44" Height="26">
+                            <Border x:Name="Track"
+                                    Background="{DynamicResource SurfaceBrush}"
+                                    BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="13" />
+                            <Border x:Name="Knob"
+                                    Width="18"
+                                    Height="18"
+                                    Margin="4,0,0,0"
+                                    HorizontalAlignment="Left"
+                                    VerticalAlignment="Center"
+                                    Background="#FFF7FAFC"
+                                    CornerRadius="9" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{DynamicResource AccentMutedBrush}" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                <Setter TargetName="Knob" Property="Margin" Value="22,0,0,0" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Track" Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SliderThumbStyle" TargetType="Thumb">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border Width="14"
+                                Height="14"
+                                Background="#FFF6F9FB"
+                                BorderBrush="#40FFFFFF"
+                                BorderThickness="0.8"
+                                CornerRadius="7">
+                            <Border.Effect>
+                                <DropShadowEffect BlurRadius="6"
+                                                  ShadowDepth="1"
+                                                  Opacity="0.16"
+                                                  Color="#AA000000" />
+                            </Border.Effect>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TrackButtonStyle" TargetType="RepeatButton">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style TargetType="Slider">
-            <Setter Property="Foreground" Value="{DynamicResource AccentBrush}" />
-            <Setter Property="Margin" Value="0,4,0,0" />
+            <Setter Property="Height" Value="22" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Slider">
+                        <Grid VerticalAlignment="Center">
+                            <Border Height="4"
+                                    VerticalAlignment="Center"
+                                    Background="{DynamicResource ThemeChipBrush}"
+                                    CornerRadius="2" />
+                            <Track x:Name="PART_Track">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource TrackButtonStyle}">
+                                        <RepeatButton.Template>
+                                            <ControlTemplate TargetType="RepeatButton">
+                                                <Border Height="4"
+                                                        Background="{DynamicResource AccentBrush}"
+                                                        CornerRadius="2" />
+                                            </ControlTemplate>
+                                        </RepeatButton.Template>
+                                    </RepeatButton>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource SliderThumbStyle}" />
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Style="{StaticResource TrackButtonStyle}" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
 
-    <Grid Margin="18">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition x:Name="MainColumn" Width="*" />
-            <ColumnDefinition x:Name="SettingsSpacerColumn" Width="0" />
-            <ColumnDefinition x:Name="SettingsColumn" Width="0" />
-        </Grid.ColumnDefinitions>
-
+    <Grid x:Name="ChromeRoot"
+          Margin="14">
         <Border x:Name="MainShell"
-                Grid.Column="0"
-                Padding="24"
                 Background="{DynamicResource PanelBrush}"
-                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="30"
+                BorderBrush="Transparent"
+                BorderThickness="0"
+                CornerRadius="28"
                 Effect="{StaticResource ShellShadow}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
+            <Grid ClipToBounds="True"
+                  Background="{DynamicResource PanelBrush}">
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
+                <Ellipse Width="220"
+                         Height="220"
+                         HorizontalAlignment="Right"
+                         VerticalAlignment="Bottom"
+                         Margin="0,0,-30,-50"
+                         Fill="#0DFFFFFF"
+                         Opacity="0.4"
+                         IsHitTestVisible="False" />
 
-                    <StackPanel Orientation="Horizontal">
-                        <Border Width="40"
-                                Height="64"
-                                Margin="0,0,16,0"
-                                Background="Transparent">
-                            <Canvas Width="40" Height="64">
-                                <Path Stroke="#F4F6F8"
-                                      StrokeThickness="2.2"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round"
-                                      Fill="Transparent"
-                                      Data="M 10 26 C 15 16, 24 9, 32 10" />
-                                <Path Stroke="#F4F6F8"
-                                      StrokeThickness="2.2"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round"
-                                      Fill="Transparent"
-                                      Data="M 7 38 C 13 21, 23 13, 35 15" />
-                                <Path Stroke="#F4F6F8"
-                                      StrokeThickness="2.2"
-                                      StrokeStartLineCap="Round"
-                                      StrokeEndLineCap="Round"
-                                      StrokeLineJoin="Round"
-                                      Fill="Transparent"
-                                      Data="M 7 42 L 21 22 L 24 35 L 33 35 L 15 56 L 18 42 Z" />
-                            </Canvas>
-                        </Border>
-                        <StackPanel VerticalAlignment="Center">
-                            <TextBlock FontSize="28"
-                                       Foreground="{DynamicResource TextBrush}"
-                                       Text="{Binding BrandTitle}" />
-                            <TextBlock Margin="0,4,0,0"
-                                       FontSize="14"
-                                       Foreground="{DynamicResource SubtleTextBrush}"
-                                       Text="{Binding BrandSubtitle}" />
-                        </StackPanel>
-                    </StackPanel>
+                <Grid Margin="20">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Column="1"
-                                Orientation="Horizontal"
-                                VerticalAlignment="Top">
-                        <Border Style="{StaticResource StatusChipStyle}"
-                                Margin="0,0,14,0">
-                            <Grid MinWidth="92">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <Ellipse x:Name="StatusDot"
-                                         Width="10"
-                                         Height="10"
-                                         Margin="0,0,12,0"
-                                         Fill="{Binding StatusDotBrush}"
-                                         VerticalAlignment="Center" />
-                                <TextBlock Grid.Column="1"
-                                           VerticalAlignment="Center"
-                                           FontSize="14"
-                                           Foreground="{DynamicResource AccentBrush}"
-                                           Text="{Binding StatusLabel}" />
-                            </Grid>
-                        </Border>
-
-                        <Button Style="{StaticResource IconBubbleButtonStyle}"
-                                Command="{Binding ToggleSettingsCommand}"
-                                Content="&#xE713;"
-                                FontFamily="Segoe Fluent Icons"
-                                FontSize="18" />
-                    </StackPanel>
-                </Grid>
-
-                <Grid Grid.Row="1">
-                    <StackPanel VerticalAlignment="Center"
-                                HorizontalAlignment="Center"
-                                Width="460"
-                                Margin="0,-10,0,0">
-                        <Border x:Name="ToggleGlow"
-                                Width="282"
-                                Height="124"
-                                HorizontalAlignment="Center"
-                                Background="{StaticResource HeroGlowBrush}"
-                                CornerRadius="66"
-                                Opacity="0.58"
-                                IsHitTestVisible="False">
-                            <Border.RenderTransform>
-                                <ScaleTransform x:Name="ToggleGlowScale" ScaleX="1" ScaleY="1" />
-                            </Border.RenderTransform>
-                            <Border.Effect>
-                                <BlurEffect Radius="28" />
-                            </Border.Effect>
-                        </Border>
-
-                        <Button x:Name="ToggleButton"
-                                Width="286"
-                                Height="98"
-                                Margin="0,-111,0,0"
-                                Command="{Binding TogglePowerCommand}"
-                                Background="Transparent"
-                                BorderThickness="0"
-                                Padding="0"
-                                Cursor="Hand">
-                            <Border x:Name="ToggleTrack"
-                                    Width="286"
-                                    Height="98"
-                                    Background="{Binding ToggleTrackBrush}"
-                                    BorderBrush="{Binding ToggleTrackBorderBrush}"
-                                    BorderThickness="1"
-                                    CornerRadius="49"
-                                    SnapsToDevicePixels="True">
-                                <Grid Margin="12">
-                                    <TextBlock Margin="42,0,0,0"
-                                               VerticalAlignment="Center"
-                                               HorizontalAlignment="Left"
-                                               FontSize="24"
-                                               FontWeight="SemiBold"
-                                               Foreground="#F6FAFB"
-                                               Panel.ZIndex="1"
-                                               Text="{Binding ToggleStateWord}" />
-                                    <Border x:Name="ToggleKnob"
-                                            Width="74"
-                                            Height="74"
-                                            HorizontalAlignment="Right"
-                                            Background="#F6F7F8"
-                                            CornerRadius="37"
-                                            SnapsToDevicePixels="True">
-                                        <Border.RenderTransform>
-                                            <TranslateTransform x:Name="ToggleKnobTransform" X="0" />
-                                        </Border.RenderTransform>
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="20"
-                                                              ShadowDepth="2"
-                                                              Opacity="0.22"
-                                                              Color="#FF000000" />
-                                        </Border.Effect>
-                                    </Border>
-                                </Grid>
-                            </Border>
-                        </Button>
-
-                        <TextBlock Margin="0,32,0,0"
-                                   HorizontalAlignment="Center"
-                                   MaxWidth="460"
-                                   FontSize="36"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource AccentBrush}"
-                                   Text="{Binding HeroLabel}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap" />
-                        <TextBlock Margin="0,12,0,0"
-                                   HorizontalAlignment="Center"
-                                   MaxWidth="420"
-                                   FontSize="16"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding StatusDetail}"
-                                   TextAlignment="Center"
-                                   TextWrapping="Wrap" />
-
-                        <Border Width="200"
-                                Height="1"
-                                Margin="0,30,0,20"
-                                HorizontalAlignment="Center"
-                                Background="{DynamicResource ThemeChipBorderBrush}" />
+                    <Grid Grid.Row="0"
+                          Height="40">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
                         <StackPanel Orientation="Horizontal"
-                                    HorizontalAlignment="Center">
-                            <TextBlock FontFamily="Segoe Fluent Icons"
-                                       FontSize="16"
-                                       Foreground="{DynamicResource SubtleTextBrush}"
-                                       Text="&#xE115;" />
-                            <TextBlock Margin="14,0,0,0"
-                                       FontSize="15"
-                                       Foreground="{DynamicResource SubtleTextBrush}"
-                                       Text="{Binding PatternLabel}" />
-                            <TextBlock Margin="6,0,0,0"
-                                       FontSize="15"
-                                       Foreground="{DynamicResource TextBrush}"
-                                       Text="{Binding LocalizedSelectedPattern}" />
+                                    VerticalAlignment="Center">
+                            <Border Width="34"
+                                    Height="44"
+                                    Padding="2"
+                                    Margin="0,0,12,0"
+                                    Background="Transparent">
+                                <Viewbox Stretch="Uniform">
+                                <Canvas Width="26" Height="40">
+                                    <Path Stroke="{DynamicResource TextBrush}"
+                                          StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          Fill="Transparent"
+                                          Data="M 6 17 C 9 10, 15 5, 20 6" />
+                                    <Path Stroke="{DynamicResource TextBrush}"
+                                          StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          Fill="Transparent"
+                                          Data="M 5 24 C 9 14, 16 9, 22 10" />
+                                    <Path Stroke="{DynamicResource TextBrush}"
+                                          StrokeThickness="1.8"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round"
+                                          Fill="Transparent"
+                                          Data="M 5 28 L 13 14 L 15 22 L 21 22 L 10 36 L 11 28 Z" />
+                                </Canvas>
+                                </Viewbox>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock FontSize="18"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource TextBrush}"
+                                           Text="{Binding BrandTitle}" />
+                                <TextBlock Margin="0,2,0,0"
+                                           FontSize="11"
+                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                           Text="{Binding BrandSubtitle}" />
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
-                </Grid>
 
-                <StackPanel Grid.Row="2"
-                            Orientation="Horizontal">
-                    <TextBlock FontFamily="Segoe Fluent Icons"
-                               FontSize="18"
-                               Foreground="{DynamicResource SubtleTextBrush}"
-                               Text="&#xE7F4;" />
-                    <TextBlock Margin="12,0,0,0"
-                               FontSize="14"
-                               Foreground="{DynamicResource SubtleTextBrush}"
-                               MaxWidth="700"
-                               Text="{Binding TrayReadyBody}"
-                               TextWrapping="Wrap" />
-                </StackPanel>
-            </Grid>
-        </Border>
-
-        <Border x:Name="SettingsShell"
-                Grid.Column="2"
-                Padding="22"
-                Background="{DynamicResource SettingsBackgroundBrush}"
-                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                BorderThickness="1"
-                CornerRadius="30"
-                Effect="{StaticResource ShellShadow}"
-                Visibility="{Binding IsSettingsOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock FontSize="28"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource TextBrush}"
-                               Text="{Binding SettingsHeaderTitle}" />
-                    <Button Grid.Column="1"
-                            Style="{StaticResource IconBubbleButtonStyle}"
-                            Width="52"
-                            Height="52"
-                            Command="{Binding ToggleSettingsCommand}"
-                            Content="&#xE711;"
-                            FontFamily="Segoe Fluent Icons"
-                            FontSize="14" />
-                </Grid>
-
-                <ScrollViewer Grid.Row="1"
-                              Margin="0,26,0,0"
-                              VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Margin="6,0,0,12"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding BehaviorSectionTitle}" />
-                        <Border Padding="14"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="20">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="210" />
-                                    </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal"
+                                    VerticalAlignment="Center"
+                                    shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                            <Border Style="{StaticResource TopBarStatusStyle}"
+                                    Margin="0,0,10,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse x:Name="StatusDot"
+                                             Width="8"
+                                             Height="8"
+                                             Margin="0,0,8,0"
+                                             VerticalAlignment="Center"
+                                             Fill="{Binding StatusDotBrush}" />
                                     <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE7AD;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
+                                               FontSize="12"
                                                Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding LaunchInLabel}" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding LaunchModeItems}"
-                                              DisplayMemberPath="Label"
-                                              SelectedValuePath="Value"
-                                              SelectedValue="{Binding SelectedLaunchMode}" />
-                                </Grid>
+                                               Text="{Binding StatusLabel}" />
+                                </StackPanel>
+                            </Border>
 
-                                <Border Height="1"
-                                        Margin="0,2,0,12"
-                                        Background="{DynamicResource ThemeChipBorderBrush}" />
+                            <Button Style="{StaticResource SidebarIconButtonStyle}"
+                                    Margin="0,0,12,0"
+                                    Command="{Binding ToggleSettingsCommand}"
+                                    Content="&#xE713;"
+                                    FontFamily="Segoe Fluent Icons"
+                                    FontSize="16" />
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="210" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE8AB;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding CloseBehaviorLabel}" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding CloseBehaviorItems}"
-                                              DisplayMemberPath="Label"
-                                              SelectedValuePath="Value"
-                                              SelectedValue="{Binding SelectedCloseBehavior}" />
-                                </Grid>
-                            </StackPanel>
-                        </Border>
+                            <Button Style="{StaticResource WindowControlButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Click="MinimizeWindow_Click"
+                                    Content="&#xE921;" />
+                            <Button x:Name="MaximizeButton"
+                                    Style="{StaticResource WindowControlButtonStyle}"
+                                    Margin="0,0,8,0"
+                                    Click="MaximizeRestoreWindow_Click"
+                                    Content="&#xE922;" />
+                            <Button Style="{StaticResource WindowControlButtonStyle}"
+                                    Click="CloseWindow_Click"
+                                    Content="&#xE8BB;" />
+                        </StackPanel>
+                    </Grid>
 
-                        <TextBlock Margin="6,24,0,12"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding MovementSectionTitle}" />
-                        <Border Padding="14"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="20">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="210" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE115;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding PatternLabel}" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding PatternItems}"
-                                              DisplayMemberPath="Label"
-                                              SelectedValuePath="Value"
-                                              SelectedValue="{Binding SelectedPattern}" />
-                                </Grid>
+                    <Grid Grid.Row="1"
+                          Margin="0,22,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                                <Border Height="1" Margin="0,2,0,12" Background="{DynamicResource ThemeChipBorderBrush}" />
+                        <Grid Margin="10,0,24,8">
+                            <StackPanel Width="450"
+                                        HorizontalAlignment="Left"
+                                        VerticalAlignment="Center">
+                                <TextBlock FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource AccentBrush}"
+                                           Text="QUIET SESSION CONTROL" />
 
-                                <Grid Margin="0,0,0,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="160" />
-                                        <ColumnDefinition Width="74" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE9E9;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding SpeedLabel}" />
-                                    <Slider Grid.Column="2"
-                                            Minimum="0.5"
-                                            Maximum="3"
-                                            TickFrequency="0.1"
-                                            IsSnapToTickEnabled="True"
-                                            Value="{Binding Speed}" />
-                                    <TextBlock Grid.Column="3"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding SpeedDisplay}" />
-                                </Grid>
+                                <Border x:Name="ToggleGlow"
+                                        Width="220"
+                                        Height="74"
+                                        Margin="0,22,0,0"
+                                        HorizontalAlignment="Left"
+                                        Background="{StaticResource HeroGlowBrush}"
+                                        CornerRadius="37"
+                                        Opacity="0.02"
+                                        IsHitTestVisible="False" />
 
-                                <Border Height="1" Margin="0,0,0,12" Background="{DynamicResource ThemeChipBorderBrush}" />
+                                <Button x:Name="ToggleButton"
+                                        Style="{StaticResource ContentOnlyButtonStyle}"
+                                        Width="220"
+                                        Height="66"
+                                        Margin="0,-70,0,0"
+                                        HorizontalAlignment="Left"
+                                        Command="{Binding TogglePowerCommand}">
+                                    <Grid>
+                                        <Border x:Name="ToggleTrack"
+                                                Background="{Binding ToggleTrackBrush}"
+                                                BorderBrush="{Binding ToggleTrackBorderBrush}"
+                                                BorderThickness="1"
+                                                CornerRadius="33">
+                                            <Grid Margin="7">
+                                                <TextBlock HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,46,0"
+                                                           FontSize="13"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#F7FBFC"
+                                                           Text="{Binding ToggleStateWord}" />
+                                                <Border Width="52"
+                                                        Height="52"
+                                                        HorizontalAlignment="Left"
+                                                        VerticalAlignment="Center"
+                                                        Background="{StaticResource ToggleKnobBrush}"
+                                                        CornerRadius="26"
+                                                        BorderBrush="#22FFFFFF"
+                                                        BorderThickness="0.8">
+                                                    <Border.RenderTransform>
+                                                        <TranslateTransform x:Name="ToggleKnobTransform" X="0" />
+                                                    </Border.RenderTransform>
+                                                    <Border.Effect>
+                                                        <DropShadowEffect BlurRadius="8"
+                                                                          ShadowDepth="1"
+                                                                          Opacity="0.11"
+                                                                          Color="#8A000000" />
+                                                    </Border.Effect>
+                                                </Border>
+                                            </Grid>
+                                        </Border>
+                                    </Grid>
+                                </Button>
 
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="160" />
-                                        <ColumnDefinition Width="74" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE740;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding SizeLabel}" />
-                                    <Slider Grid.Column="2"
-                                            Minimum="40"
-                                            Maximum="180"
-                                            TickFrequency="5"
-                                            IsSnapToTickEnabled="True"
-                                            Value="{Binding Size}" />
-                                    <TextBlock Grid.Column="3"
-                                               HorizontalAlignment="Right"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="{Binding SizeDisplay}" />
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <TextBlock Margin="6,24,0,12"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding IdleDelayLabel}" />
-                        <Border Padding="14"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="20">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="160" />
-                                    <ColumnDefinition Width="74" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="&#xE823;" />
-                                <TextBlock Grid.Column="1"
-                                           Margin="16,0,0,0"
-                                           VerticalAlignment="Center"
-                                           FontSize="15"
+                                <TextBlock Margin="0,28,0,0"
+                                           MaxWidth="440"
+                                           FontSize="34"
+                                           FontWeight="SemiBold"
                                            Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding IdleDelayLabel}" />
-                                <Slider Grid.Column="2"
-                                        Minimum="5"
-                                        Maximum="60"
-                                        TickFrequency="1"
-                                        IsSnapToTickEnabled="True"
-                                        Value="{Binding IdleDelaySeconds}" />
-                                <TextBlock Grid.Column="3"
-                                           HorizontalAlignment="Right"
-                                           VerticalAlignment="Center"
+                                           Text="{Binding HeroLabel}"
+                                           TextWrapping="Wrap" />
+
+                                <TextBlock Margin="0,10,0,0"
+                                           MaxWidth="390"
                                            FontSize="15"
                                            Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="{Binding IdleDelayDisplay}" />
+                                           Text="{Binding StatusDetail}"
+                                           TextWrapping="Wrap" />
+
+                                <StackPanel Margin="0,26,0,0"
+                                            Orientation="Horizontal">
+                                    <Border Style="{StaticResource InfoChipStyle}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontSize="12"
+                                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                                       Text="{Binding PatternLabel}" />
+                                            <TextBlock Margin="8,0,0,0"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextBrush}"
+                                                       Text="{Binding LocalizedSelectedPattern}" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Style="{StaticResource InfoChipStyle}"
+                                            Margin="10,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock FontSize="12"
+                                                       Foreground="{DynamicResource SubtleTextBrush}"
+                                                       Text="{Binding IdleDelayLabel}" />
+                                            <TextBlock Margin="8,0,0,0"
+                                                       FontSize="12"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource TextBrush}"
+                                                       Text="{Binding IdleDelayDisplay}" />
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border x:Name="SettingsShell"
+                                Grid.Column="1"
+                                Width="0"
+                                Opacity="0"
+                                Padding="18"
+                                Margin="0,0,0,4"
+                                Background="{DynamicResource SettingsBackgroundBrush}"
+                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="24"
+                                Effect="{StaticResource PanelShadow}"
+                                IsHitTestVisible="False">
+                            <Border.RenderTransform>
+                                <TranslateTransform x:Name="SettingsTranslateTransform" X="28" />
+                            </Border.RenderTransform>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <Grid shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <TextBlock FontSize="22"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource TextBrush}"
+                                                   Text="Settings" />
+                                        <TextBlock Margin="0,6,0,0"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="Refine how WIGGLER behaves in the background." />
+                                    </StackPanel>
+                                    <Button Grid.Column="1"
+                                            Style="{StaticResource SidebarIconButtonStyle}"
+                                            Width="38"
+                                            Height="38"
+                                            Command="{Binding ToggleSettingsCommand}"
+                                            Content="×"
+                                            FontSize="20"
+                                            FontWeight="Light" />
+                                </Grid>
+
+                                <ScrollViewer Grid.Row="1"
+                                              Margin="0,18,0,0"
+                                              Padding="0,0,6,18"
+                                              VerticalScrollBarVisibility="Auto"
+                                              HorizontalScrollBarVisibility="Disabled">
+                                    <StackPanel>
+                                        <TextBlock Margin="4,0,0,10"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="{Binding BehaviorSectionLabel}" />
+                                        <Border Style="{StaticResource SectionShellStyle}">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding ActivationModeLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding ActivationModeItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedActivationMode}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding LaunchModeLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding LaunchModeItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedLaunchMode}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding CloseBehaviorLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding CloseBehaviorItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedCloseBehavior}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding StartupLabel}" />
+                                                    <CheckBox Grid.Column="1"
+                                                              Style="{StaticResource SmallToggleStyle}"
+                                                              IsChecked="{Binding StartOnWindowsStartup}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding RememberStateLabel}" />
+                                                    <CheckBox Grid.Column="1"
+                                                              Style="{StaticResource SmallToggleStyle}"
+                                                              IsChecked="{Binding RememberLastState}" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Margin="4,24,0,10"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="{Binding MovementSectionLabel}" />
+                                        <Border Style="{StaticResource SectionShellStyle}">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding PatternLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding PatternItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedPattern}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="126" />
+                                                        <ColumnDefinition Width="52" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding MovementSpeedLabel}" />
+                                                    <Slider Grid.Column="1"
+                                                            Minimum="0.5"
+                                                            Maximum="3"
+                                                            TickFrequency="0.1"
+                                                            IsSnapToTickEnabled="True"
+                                                            Value="{Binding Speed}" />
+                                                    <TextBlock Grid.Column="2"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center"
+                                                               FontSize="12"
+                                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                                               Text="{Binding SpeedDisplay}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="126" />
+                                                        <ColumnDefinition Width="52" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding MovementSizeLabel}" />
+                                                    <Slider Grid.Column="1"
+                                                            Minimum="40"
+                                                            Maximum="180"
+                                                            TickFrequency="5"
+                                                            IsSnapToTickEnabled="True"
+                                                            Value="{Binding Size}" />
+                                                    <TextBlock Grid.Column="2"
+                                                               HorizontalAlignment="Right"
+                                                               VerticalAlignment="Center"
+                                                               FontSize="12"
+                                                               Foreground="{DynamicResource SubtleTextBrush}"
+                                                               Text="{Binding SizeDisplay}" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Margin="4,24,0,10"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="{Binding IdleSectionLabel}" />
+                                        <Border Style="{StaticResource SectionShellStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="126" />
+                                                    <ColumnDefinition Width="52" />
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock VerticalAlignment="Center"
+                                                           FontSize="13"
+                                                           Foreground="{DynamicResource TextBrush}"
+                                                           Text="{Binding IdleDelayLabel}" />
+                                                <Slider Grid.Column="1"
+                                                        Minimum="1"
+                                                        Maximum="60"
+                                                        TickFrequency="1"
+                                                        IsSnapToTickEnabled="True"
+                                                        Value="{Binding IdleDelaySeconds}" />
+                                                <TextBlock Grid.Column="2"
+                                                           HorizontalAlignment="Right"
+                                                           VerticalAlignment="Center"
+                                                           FontSize="12"
+                                                           Foreground="{DynamicResource SubtleTextBrush}"
+                                                           Text="{Binding IdleDelayDisplay}" />
+                                            </Grid>
+                                        </Border>
+
+                                        <TextBlock Margin="4,24,0,10"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="{Binding AppearanceSectionLabel}" />
+                                        <Border Style="{StaticResource SectionShellStyle}">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding ThemeLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding ThemeModeItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedThemeMode}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding AccentColorLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding AccentColorItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedThemeVibe}" />
+                                                </Grid>
+                                                <Grid Margin="0,0,0,12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding CompactModeLabel}" />
+                                                    <CheckBox Grid.Column="1"
+                                                              Style="{StaticResource SmallToggleStyle}"
+                                                              IsChecked="{Binding CompactMode}" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="170" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock VerticalAlignment="Center"
+                                                               FontSize="13"
+                                                               Foreground="{DynamicResource TextBrush}"
+                                                               Text="{Binding LanguageLabel}" />
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding LanguageItems}"
+                                                              DisplayMemberPath="Label"
+                                                              SelectedValuePath="Value"
+                                                              SelectedValue="{Binding SelectedLanguageCode}" />
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <TextBlock Margin="4,24,0,10"
+                                                   FontSize="11"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SubtleTextBrush}"
+                                                   Text="{Binding HelpSectionLabel}" />
+                                        <Border Style="{StaticResource SectionShellStyle}">
+                                            <StackPanel>
+                                                <Button Style="{StaticResource SecondaryButtonStyle}"
+                                                        Margin="0,0,0,10"
+                                                        HorizontalAlignment="Stretch"
+                                                        Command="{Binding ReplayTutorialCommand}"
+                                                        Content="{Binding ReplayTutorialLabel}" />
+                                                <Button Style="{StaticResource SecondaryButtonStyle}"
+                                                        HorizontalAlignment="Stretch"
+                                                        Command="{Binding AboutCommand}"
+                                                        Content="{Binding AboutLabel}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </StackPanel>
+                                </ScrollViewer>
                             </Grid>
                         </Border>
-
-                        <TextBlock Margin="6,24,0,12"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding AppearanceSectionTitle}" />
-                        <Border Padding="14"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="20">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="210" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE790;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding ThemeLabel}" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding ThemeModeItems}"
-                                              DisplayMemberPath="Label"
-                                              SelectedValuePath="Value"
-                                              SelectedValue="{Binding SelectedThemeMode}" />
-                                </Grid>
-
-                                <Border Height="1"
-                                        Margin="0,2,0,12"
-                                        Background="{DynamicResource ThemeChipBorderBrush}" />
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="210" />
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock VerticalAlignment="Center"
-                                               FontFamily="Segoe Fluent Icons"
-                                               FontSize="18"
-                                               Foreground="{DynamicResource SubtleTextBrush}"
-                                               Text="&#xE774;" />
-                                    <TextBlock Grid.Column="1"
-                                               Margin="16,0,0,0"
-                                               VerticalAlignment="Center"
-                                               FontSize="15"
-                                               Foreground="{DynamicResource TextBrush}"
-                                               Text="{Binding LanguageLabel}" />
-                                    <ComboBox Grid.Column="2"
-                                              ItemsSource="{Binding LanguageItems}"
-                                              DisplayMemberPath="Label"
-                                              SelectedValuePath="Value"
-                                              SelectedValue="{Binding SelectedLanguageCode}" />
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <TextBlock Margin="6,24,0,12"
-                                   FontSize="13"
-                                   Foreground="{DynamicResource SubtleTextBrush}"
-                                   Text="{Binding HelpSectionTitle}" />
-                        <Border Padding="14"
-                                Background="{DynamicResource SettingsPanelBrush}"
-                                BorderBrush="{DynamicResource ThemeChipBorderBrush}"
-                                BorderThickness="1"
-                                CornerRadius="20">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <TextBlock VerticalAlignment="Center"
-                                           FontFamily="Segoe Fluent Icons"
-                                           FontSize="18"
-                                           Foreground="{DynamicResource SubtleTextBrush}"
-                                           Text="&#xE897;" />
-                                <TextBlock Grid.Column="1"
-                                           Margin="16,0,0,0"
-                                           VerticalAlignment="Center"
-                                           FontSize="15"
-                                           Foreground="{DynamicResource TextBrush}"
-                                           Text="{Binding ReplayTutorialLabel}" />
-                                <Button Grid.Column="2"
-                                        Width="44"
-                                        Height="44"
-                                        Style="{StaticResource BubbleButtonStyle}"
-                                        Command="{Binding ReplayTutorialCommand}"
-                                        Content="&#xE72A;"
-                                        FontFamily="Segoe Fluent Icons"
-                                        FontSize="14" />
-                            </Grid>
-                        </Border>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Grid>
+                </Grid>
             </Grid>
         </Border>
     </Grid>
@@ -782,8 +1055,8 @@
                     <DoubleAnimation Storyboard.TargetName="StatusDot"
                                      Storyboard.TargetProperty="Opacity"
                                      From="1"
-                                     To="0.55"
-                                     Duration="0:0:1.2" />
+                                     To="0.48"
+                                     Duration="0:0:1.15" />
                 </Storyboard>
             </BeginStoryboard>
         </EventTrigger>

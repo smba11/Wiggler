@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using WigglerBySmba.Models;
 using WigglerBySmba.Services;
@@ -9,18 +10,26 @@ namespace WigglerBySmba;
 
 public partial class MainWindow : Window
 {
-    private const double CompactWidth = 920;
-    private const double ExpandedWidth = 1320;
-    private const double CompactMinWidth = 860;
-    private const double ExpandedMinWidth = 1120;
+    private const double ToggleKnobOnX = 146d;
+    private const double ToggleKnobOffX = 0d;
+    private const double ToggleGlowOnOpacity = 0.08d;
+    private const double ToggleGlowOffOpacity = 0.0d;
+    private const double SettingsOpenWidth = 392d;
+    private const double SettingsClosedWidth = 0d;
+    private const double SettingsOpenOffset = 0d;
+    private const double SettingsClosedOffset = 28d;
+
     private readonly SettingsService _settingsService;
     private readonly MouseHookService _mouseHookService;
     private readonly MouseMovementService _mouseMovementService;
     private readonly TrayIconService _trayIconService;
     private readonly ThemeService _themeService;
     private readonly MainViewModel _viewModel;
+    private readonly System.Windows.Threading.DispatcherTimer _moveStopTimer;
     private bool _isExiting;
     private bool _isDisposed;
+    private bool _isTutorialOpen;
+    private bool _isMoveOptimized;
 
     public MainWindow()
     {
@@ -34,6 +43,11 @@ public partial class MainWindow : Window
         _trayIconService = new TrayIconService();
         _themeService = new ThemeService();
         _viewModel = new MainViewModel(settings, _settingsService, _mouseHookService, _mouseMovementService);
+        _moveStopTimer = new System.Windows.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromMilliseconds(140)
+        };
+        _moveStopTimer.Tick += OnMoveStopTimerTick;
 
         DataContext = _viewModel;
 
@@ -59,34 +73,49 @@ public partial class MainWindow : Window
         };
 
         _trayIconService.Initialize();
+        _trayIconService.SetVisible(_viewModel.ShowTrayIcon);
         _trayIconService.UpdateStatus(_viewModel.Status);
 
         Loaded += OnLoaded;
         StateChanged += OnStateChanged;
         Closing += OnClosing;
+        LocationChanged += OnLocationChanged;
+        SizeChanged += OnSizeChanged;
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
     {
         _viewModel.Initialize();
-        ApplySettingsLayout(_viewModel.IsSettingsOpen, false);
+        ApplySettingsLayout(_viewModel.IsSettingsOpen, animate: false);
         ApplyToggleVisualState(_viewModel.IsPoweredOn);
+        UpdateWindowChromeState();
     }
 
     private void OnViewModelPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainViewModel.IsSettingsOpen))
         {
-            ApplySettingsLayout(_viewModel.IsSettingsOpen, true);
+            ApplySettingsLayout(_viewModel.IsSettingsOpen);
+        }
+        else if (e.PropertyName == nameof(MainViewModel.ShowTrayIcon))
+        {
+            _trayIconService.SetVisible(_viewModel.ShowTrayIcon);
         }
     }
 
     private void OnStateChanged(object? sender, EventArgs e)
     {
+        UpdateWindowChromeState();
+
         if (WindowState == WindowState.Minimized)
         {
-            _trayIconService.EnsureVisible();
-            if (_viewModel.SelectedLaunchMode == LaunchMode.Tray || _viewModel.SelectedCloseBehavior == CloseBehavior.MinimizeToTray)
+            if (_viewModel.ShowTrayIcon)
+            {
+                _trayIconService.EnsureVisible();
+            }
+
+            if (_viewModel.SelectedLaunchMode == LaunchMode.Tray ||
+                (_viewModel.SelectedCloseBehavior == CloseBehavior.MinimizeToTray && _viewModel.KeepRunningInBackground))
             {
                 HideToTray();
             }
@@ -95,7 +124,7 @@ public partial class MainWindow : Window
 
     private void OnClosing(object? sender, CancelEventArgs e)
     {
-        if (_isExiting || _viewModel.SelectedCloseBehavior == CloseBehavior.Exit)
+        if (_isExiting || !_viewModel.KeepRunningInBackground || _viewModel.SelectedCloseBehavior == CloseBehavior.Exit)
         {
             PrepareForExit();
             return;
@@ -107,27 +136,44 @@ public partial class MainWindow : Window
 
     private void ShowTutorialDialog()
     {
-        var wasHidden = !IsVisible;
-        if (wasHidden)
+        if (_isTutorialOpen)
         {
-            RevealWindow();
+            return;
         }
 
-        var tutorialWindow = new TutorialWindow(_viewModel.SelectedLanguageCode)
+        _isTutorialOpen = true;
+        var wasHidden = !IsVisible;
+        try
         {
-            Owner = this
-        };
+            if (wasHidden)
+            {
+                RevealWindow();
+            }
 
-        tutorialWindow.ShowDialog();
-        _viewModel.CompleteOnboarding();
+            var tutorialWindow = new TutorialWindow(_viewModel.SelectedLanguageCode);
+            if (IsVisible)
+            {
+                tutorialWindow.Owner = this;
+            }
+
+            tutorialWindow.ShowDialog();
+            _viewModel.CompleteOnboarding();
+        }
+        finally
+        {
+            _isTutorialOpen = false;
+        }
     }
 
     private void HideToTray()
     {
         Hide();
         ShowInTaskbar = false;
-        _trayIconService.EnsureVisible();
-        _trayIconService.ShowRunningInTrayTip();
+        if (_viewModel.ShowTrayIcon)
+        {
+            _trayIconService.EnsureVisible();
+            _trayIconService.ShowRunningInTrayTip();
+        }
     }
 
     private void RevealWindow()
@@ -148,31 +194,46 @@ public partial class MainWindow : Window
         _isDisposed = true;
         _viewModel.Dispose();
         _trayIconService.Dispose();
+        _moveStopTimer.Stop();
+        _moveStopTimer.Tick -= OnMoveStopTimerTick;
     }
 
-    private void ApplySettingsLayout(bool isOpen, bool animateWidth)
+    private void ApplySettingsLayout(bool isOpen, bool animate = true)
     {
-        SettingsSpacerColumn.Width = isOpen ? new GridLength(28) : new GridLength(0);
-        SettingsColumn.Width = isOpen ? new GridLength(1.02, GridUnitType.Star) : new GridLength(0);
-        SettingsShell.Visibility = isOpen ? Visibility.Visible : Visibility.Collapsed;
+        SettingsShell.IsHitTestVisible = isOpen;
 
-        MinWidth = isOpen ? ExpandedMinWidth : CompactMinWidth;
-        var targetWidth = isOpen ? ExpandedWidth : CompactWidth;
+        var targetWidth = isOpen ? SettingsOpenWidth : SettingsClosedWidth;
+        var targetOpacity = isOpen ? 1d : 0d;
+        var targetOffset = isOpen ? SettingsOpenOffset : SettingsClosedOffset;
 
-        if (!animateWidth)
+        if (!animate)
         {
-            Width = targetWidth;
+            SettingsShell.Width = targetWidth;
+            SettingsShell.Opacity = targetOpacity;
+            SettingsTranslateTransform.X = targetOffset;
             return;
         }
 
-        BeginAnimation(WidthProperty, new System.Windows.Media.Animation.DoubleAnimation
+        var ease = new CubicEase { EasingMode = EasingMode.EaseOut };
+        SettingsShell.BeginAnimation(WidthProperty, new DoubleAnimation
         {
             To = targetWidth,
-            Duration = TimeSpan.FromMilliseconds(220),
-            EasingFunction = new CubicEase
-            {
-                EasingMode = EasingMode.EaseOut
-            }
+            Duration = TimeSpan.FromMilliseconds(240),
+            EasingFunction = ease
+        });
+
+        SettingsShell.BeginAnimation(OpacityProperty, new DoubleAnimation
+        {
+            To = targetOpacity,
+            Duration = TimeSpan.FromMilliseconds(180),
+            EasingFunction = ease
+        });
+
+        SettingsTranslateTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, new DoubleAnimation
+        {
+            To = targetOffset,
+            Duration = TimeSpan.FromMilliseconds(240),
+            EasingFunction = ease
         });
     }
 
@@ -181,46 +242,94 @@ public partial class MainWindow : Window
         var poweredOn = status is WigglerStatus.Armed or WigglerStatus.Running;
         ApplyToggleVisualState(poweredOn);
 
-        var knobTarget = poweredOn ? -162d : 0d;
-        var glowTarget = poweredOn ? 0.88d : 0.28d;
-        var glowScale = poweredOn ? 1.08d : 0.92d;
-
         ToggleKnobTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, new DoubleAnimation
         {
-            To = knobTarget,
-            Duration = TimeSpan.FromMilliseconds(320),
+            To = poweredOn ? ToggleKnobOnX : ToggleKnobOffX,
+            Duration = TimeSpan.FromMilliseconds(260),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         });
 
         ToggleGlow.BeginAnimation(OpacityProperty, new DoubleAnimation
         {
-            To = glowTarget,
-            Duration = TimeSpan.FromMilliseconds(260),
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-        });
-
-        ToggleGlowScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleXProperty, new DoubleAnimation
-        {
-            To = glowScale,
-            Duration = TimeSpan.FromMilliseconds(260),
-            AutoReverse = poweredOn,
-            EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
-        });
-
-        ToggleGlowScale.BeginAnimation(System.Windows.Media.ScaleTransform.ScaleYProperty, new DoubleAnimation
-        {
-            To = glowScale,
-            Duration = TimeSpan.FromMilliseconds(260),
-            AutoReverse = poweredOn,
+            To = poweredOn ? ToggleGlowOnOpacity : ToggleGlowOffOpacity,
+            Duration = TimeSpan.FromMilliseconds(220),
             EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
         });
     }
 
     private void ApplyToggleVisualState(bool poweredOn)
     {
-        ToggleKnobTransform.X = poweredOn ? -162d : 0d;
-        ToggleGlow.Opacity = poweredOn ? 0.72d : 0.28d;
-        ToggleGlowScale.ScaleX = 1d;
-        ToggleGlowScale.ScaleY = 1d;
+        ToggleKnobTransform.X = poweredOn ? ToggleKnobOnX : ToggleKnobOffX;
+        ToggleGlow.Opacity = poweredOn ? ToggleGlowOnOpacity : ToggleGlowOffOpacity;
+    }
+
+    private void OnLocationChanged(object? sender, EventArgs e)
+    {
+        OptimizeForMove();
+    }
+
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        if (!e.WidthChanged && !e.HeightChanged)
+        {
+            return;
+        }
+
+        OptimizeForMove();
+    }
+
+    private void OptimizeForMove()
+    {
+        if (!_isMoveOptimized)
+        {
+            _isMoveOptimized = true;
+            MainShell.Effect = null;
+            SettingsShell.Effect = null;
+            MainShell.CacheMode = new BitmapCache();
+            SettingsShell.CacheMode = new BitmapCache();
+        }
+
+        _moveStopTimer.Stop();
+        _moveStopTimer.Start();
+    }
+
+    private void OnMoveStopTimerTick(object? sender, EventArgs e)
+    {
+        _moveStopTimer.Stop();
+        if (!_isMoveOptimized)
+        {
+            return;
+        }
+
+        _isMoveOptimized = false;
+        MainShell.ClearValue(EffectProperty);
+        SettingsShell.ClearValue(EffectProperty);
+        MainShell.CacheMode = null;
+        SettingsShell.CacheMode = null;
+    }
+
+    private void UpdateWindowChromeState()
+    {
+        var isMaximized = WindowState == WindowState.Maximized;
+        ChromeRoot.Margin = isMaximized ? new Thickness(6) : new Thickness(14);
+        MainShell.CornerRadius = isMaximized ? new CornerRadius(20) : new CornerRadius(28);
+        MaximizeButton.Content = isMaximized ? "\uE923" : "\uE922";
+    }
+
+    private void MinimizeWindow_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeRestoreWindow_Click(object sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized
+            ? WindowState.Normal
+            : WindowState.Maximized;
+    }
+
+    private void CloseWindow_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
     }
 }

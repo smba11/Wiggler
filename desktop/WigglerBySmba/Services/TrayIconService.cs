@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.IO;
 using System.Windows.Forms;
 using WigglerBySmba.Models;
 
@@ -33,7 +34,7 @@ public sealed class TrayIconService : IDisposable
         _notifyIcon = new NotifyIcon
         {
             Text = "WIGGLER by SMBA",
-            Icon = SystemIcons.Application,
+            Icon = LoadAppIcon(),
             ContextMenuStrip = new ContextMenuStrip()
         };
 
@@ -78,5 +79,27 @@ public sealed class TrayIconService : IDisposable
     {
         _notifyIcon.Visible = false;
         _notifyIcon.Dispose();
+    }
+
+    private static Icon LoadAppIcon()
+    {
+        try
+        {
+            var processPath = Environment.ProcessPath;
+
+            if (!string.IsNullOrWhiteSpace(processPath) && File.Exists(processPath))
+            {
+                using var extracted = Icon.ExtractAssociatedIcon(processPath);
+                if (extracted is not null)
+                {
+                    return (Icon)extracted.Clone();
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return SystemIcons.Application;
     }
 }

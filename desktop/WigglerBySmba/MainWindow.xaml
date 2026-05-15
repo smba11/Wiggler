@@ -6,6 +6,7 @@
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         mc:Ignorable="d"
         Title="WIGGLER by SMBA"
+        Icon="Assets/Wiggler.ico"
         Width="1180"
         Height="760"
         MinWidth="940"

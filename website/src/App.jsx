@@ -3,7 +3,7 @@ import './App.css'
 
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
 const RELEASES_URL = 'https://github.com/smba11/Wiggler/releases/tag/v1.1.0'
-const DOWNLOAD_URL = 'https://github.com/smba11/Wiggler/releases/download/v1.1.0/WIGGLER-by-SMBA-win-x64.zip'
+const DOWNLOAD_URL = `${import.meta.env.BASE_URL}downloads/WIGGLER-by-SMBA.exe`
 
 const patternConfig = {
   Circle: {

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
 
 const patterns = ['Circle', 'Square', 'Triangle', 'Figure 8', 'Parallelogram', 'Random']
+const RELEASES_URL = 'https://github.com/smba11/Wiggler/releases/tag/v1.1.0'
+const DOWNLOAD_URL = 'https://github.com/smba11/Wiggler/releases/download/v1.1.0/WIGGLER-by-SMBA-win-x64.zip'
 
 const patternConfig = {
   Circle: {
@@ -1472,6 +1474,48 @@ function PatternDemo({ language }) {
   )
 }
 
+function DeferredPatternDemo({ language }) {
+  const shellRef = useRef(null)
+  const [isVisible, setIsVisible] = useState(false)
+  const text = getCopy(language)
+
+  useEffect(() => {
+    if (isVisible || !shellRef.current) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setIsVisible(true)
+          observer.disconnect()
+        }
+      },
+      { rootMargin: '240px 0px' },
+    )
+
+    observer.observe(shellRef.current)
+
+    return () => observer.disconnect()
+  }, [isVisible])
+
+  return (
+    <div ref={shellRef}>
+      {isVisible ? (
+        <PatternDemo language={language} />
+      ) : (
+        <div className="demo-card demo-card-placeholder">
+          <div className="demo-placeholder-copy">
+            <p className="eyebrow">{text.browserDemo}</p>
+            <h3>{text.demoChooserTitle}</h3>
+            <p>{text.demoBody}</p>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 function SettingsPopover({ language, setLanguage, theme, setTheme, isOpen, setIsOpen }) {
   const text = getCopy(language)
   const themeOptions = useMemo(
@@ -1624,15 +1668,26 @@ function App() {
               <a className="button primary" href="#demo">
                 {text.watchDemo}
               </a>
-              <a
-                className="button ghost"
-                href="https://github.com/smba11/Wiggler/releases"
-                target="_blank"
-                rel="noreferrer"
-              >
-                {text.desktopDownloads}
-              </a>
-            </div>
+            <a
+              className="button ghost"
+              href={DOWNLOAD_URL}
+              target="_blank"
+              rel="noreferrer"
+              download
+              data-download="windows"
+              title="Download WIGGLER for Windows"
+            >
+              {text.desktopDownloads}
+            </a>
+            <a
+              className="button ghost subtle-link"
+              href={RELEASES_URL}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {text.openReleases}
+            </a>
+          </div>
           </div>
 
           <div className="hero-panel">
@@ -1669,7 +1724,7 @@ function App() {
           <div className="section-heading">
             <h2>{text.demoTitle}</h2>
           </div>
-          <PatternDemo language={language} />
+          <DeferredPatternDemo language={language} />
         </section>
       </main>
     </div>

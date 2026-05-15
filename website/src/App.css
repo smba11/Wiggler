@@ -126,6 +126,11 @@
   color: var(--ink);
 }
 
+.button.subtle-link {
+  background: transparent;
+  box-shadow: none;
+}
+
 .settings-wrap {
   position: relative;
 }
@@ -314,6 +319,11 @@
   margin-top: 26px;
 }
 
+.demo-section {
+  content-visibility: auto;
+  contain-intrinsic-size: 860px;
+}
+
 .questions-bubble {
   border: 1px solid var(--line);
   border-radius: 32px;
@@ -412,6 +422,30 @@
   padding: 18px;
   position: relative;
   overflow: hidden;
+}
+
+.demo-card-placeholder {
+  min-height: 620px;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at top right, var(--wash-strong), transparent 34%),
+    linear-gradient(180deg, var(--panel-strong), var(--panel)),
+    var(--panel);
+}
+
+.demo-placeholder-copy {
+  max-width: 420px;
+  text-align: center;
+}
+
+.demo-placeholder-copy h3 {
+  margin: 10px 0 12px;
+}
+
+.demo-placeholder-copy p:last-child {
+  color: var(--muted-strong);
+  line-height: 1.7;
 }
 
 .demo-toolbar {
@@ -669,6 +703,10 @@
   .demo-card,
   .questions-bubble {
     padding: 22px;
+  }
+
+  .demo-card-placeholder {
+    min-height: 480px;
   }
 
   .hero-copy h1 {
